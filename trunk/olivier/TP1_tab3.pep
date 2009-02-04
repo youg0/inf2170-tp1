@@ -25,7 +25,6 @@ valid:	LDX mois,d
 	STX jMax,d	; Adresse de l'element correspondant au mois
 
 	LDX jour,d
-	;DECO jour,d
 	CPX jMax,n
 	BRGT erreur
 	BR cjour
@@ -39,9 +38,9 @@ erreur:	STRO msgErr,d
 	BR saisie
 
 cjour:	LDX jour,d	; Verifier si c'est le dernier jour du mois
-	ADDX 1,d;
-	STX jour;;ERROR: Addressing mode expected.
-	CPA jMax,n
+	ADDX 1,i
+	STX jour,d
+	CPX jMax,n
 	BRGT djour
 	BR affic
 djour:	LDX 1,i		; Si c'est le dernier jour du mois
@@ -49,8 +48,23 @@ djour:	LDX 1,i		; Si c'est le dernier jour du mois
 	LDX adMot,d
 	ADDX 12,i	; Ajouter 12 a l'adresse
 	STX adMot,d
+	LDX 144,i	; Enregistrer l'adresse du nombre de mois max
+	ADDX jMjan,i	; Ajouter l'addresse du premier mois
+	CPX adMot,d
+	BRLE aannee
+	BR affic
+aannee:	LDX jan,i	; Ajouter une annee et mets le mois a Janvier
+	STX adMot,d
+	LDX annee,d
+	ADDX 1,i
+	STX annee,d
+
 affic:	DECO jour,d
+	LDX adMot,d
+	ADDX 1,i
+	STX adMot,d
 	STRO adMot,n
+	DECO annee,d
 
 
 
@@ -80,7 +94,7 @@ fin:	STOP
 	
 	adMot:	.ASCII " "
 
-	jan:	.ASCII	" janvier   \x00"
+	jan:	.ASCII	"  janvier   \x00"
 	fev:	.ASCII	" fevrier   \x00"
 	mar:	.ASCII	" mars      \x00"
 	avr:	.ASCII	" avril     \x00"
