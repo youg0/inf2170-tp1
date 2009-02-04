@@ -1,4 +1,5 @@
 
+
 ;// Saisie des donnees \\
 saisie:	STRO msgInv,d
 	DECI jour,d 
