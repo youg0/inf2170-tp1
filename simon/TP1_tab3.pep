@@ -7,25 +7,68 @@ saisie:	STRO msgInv,d
 	DECI annee,d
 
 ;// Calcul et validation \\
-valid:	LDX mois,d
-	SUBX 1,i
-	ASLX
-	STX temp2,d	; (mois - 1) * 2, pour le tableau de jours max
+valid:	LDA mois,d
+	SUBA 1,i
+	ASLA
+	STA temp2,d	; (mois - 1) * 2, pour le tableau de jours max
 
 
-	ASLX
-	STX temp,d	; (mois - 1) * 4)
-	ASLX
-	ADDX temp,d	; (mois - 1) * 4 + (mois - 1) * 8
-	ADDX jan,i	; Ajouter l'adresse du premier element du tab
-	STX adMot,d	; Adresse du mois
+	ASLA
+	STA temp,d	; (mois - 1) * 4)
+	ASLA
+	ADDA temp,d	; (mois - 1) * 4 + (mois - 1) * 8
+	ADDA jan,i	; Ajouter l'adresse du premier element du tab
+	STA adMot,d	; Adresse du mois
+	
+	LDA mois,d	; Verifier si c'est fevrier pour verification bissextile
+	CPA 2,i
+	BREQ bis
 
-	LDX temp2,d
-	ADDX jMjan,i	; Ajouter l'adresse du premier element du tab
-	STX jMax,d	; Adresse de l'element correspondant au mois
+nonbis:	LDA temp2,d
+	ADDA jMjan,i	; Ajouter l'adresse du premier element du tab
+	STA jMax,d	; Adresse de l'element correspondant au mois
+	LDA jMax,n
+	STA jMaxV,d
+	BR comp
 
-	LDX jour,d
-	CPX jMax,n
+bis:	LDA annee,d
+	CPA 400,i
+	BRLT debC 	; divid <= 400
+	BREQ bPos
+
+debQc: 	SUBA 400,i 	; Verifier si divisible par 400
+	CPA 400,i		
+	BREQ bPos 	; divid == 400
+	BRGT debQc 	; 400 < divid
+	BR debC		; Non divisible par 400, passer au test de 100
+
+debC: 	CPA 100,i	; Verifier si divisible par 100
+	BRLT debQ 	; divid < 100
+	SUBA 100,i 
+	CPA 100,i 
+	BREQ bNeg 	; divid == 100
+	BRGT debC 	; 100 > divid
+
+debQ: 	NOP0		; Boucle do while
+	SUBA 4,i	; Soustraire 4
+	CPA 0,i
+	BRGT debQ	; divid > 0
+	BRLT bNeg	; divid < 0
+	BR bPos		; divid == 0
+
+bNeg:	LDX 0,i
+	STX biss,d
+	LDX 28,i
+	STX jMaxV,d
+	BR comp
+	
+bPos:	LDX 1,i
+	STX biss,d
+	LDX 29,i
+	STX jMaxV,d
+	
+comp:	LDA jour,d
+	CPA jMaxV,d
 	BRGT erreur
 	BR cjour
 	
@@ -37,32 +80,32 @@ erreur:	STRO msgErr,d
 	DECI jour,d
 	BR saisie
 
-cjour:	LDX jour,d	; Verifier si c'est le dernier jour du mois
-	ADDX 1,i
-	STX jour,d
-	CPX jMax,n
+cjour:	LDA jour,d	; Verifier si c'est le dernier jour du mois
+	ADDA 1,i
+	STA jour,d
+	CPA jMaxV,d
 	BRGT djour
 	BR affic
-djour:	LDX 1,i		; Si c'est le dernier jour du mois
-	STX jour,d
-	LDX adMot,d
-	ADDX 12,i	; Ajouter 12 a l'adresse
-	STX adMot,d
-	LDX 144,i	; Enregistrer l'adresse du nombre de mois max
-	ADDX jMjan,i	; Ajouter l'addresse du premier mois
-	CPX adMot,d
+djour:	LDA 1,i		; Si c'est le dernier jour du mois
+	STA jour,d
+	LDA adMot,d
+	ADDA 12,i	; Ajouter 12 a l'adresse
+	STA adMot,d
+	LDA 144,i	; Enregistrer l'adresse du nombre de mois max
+	ADDA jMjan,i	; Ajouter l'addresse du premier mois
+	CPA adMot,d
 	BRLE aannee
 	BR affic
-aannee:	LDX jan,i	; Ajouter une annee et mets le mois a Janvier
-	STX adMot,d
-	LDX annee,d
-	ADDX 1,i
-	STX annee,d
+aannee:	LDA jan,i	; Ajouter une annee et mets le mois a Janvier
+	STA adMot,d
+	LDA annee,d
+	ADDA 1,i
+	STA annee,d
 
 affic:	DECO jour,d
-	LDX adMot,d
-	ADDX 1,i
-	STX adMot,d
+	LDA adMot,d
+	ADDA 1,i
+	STA adMot,d
 	STRO adMot,n
 	DECO annee,d
 
@@ -78,6 +121,8 @@ fin:	STOP
 	annee:	.WORD 0
 	mois:	.WORD 0
 	jMax:	.WORD 0
+	jMaxV:	.WORD 0		;jMax apres verification d'annee bissextile
+	biss:	.WORD 0
 
 	jMjan:	.WORD 31
 	jMfev:	.WORD 28
