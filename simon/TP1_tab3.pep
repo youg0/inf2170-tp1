@@ -49,12 +49,14 @@ debC: 	CPA 100,i	; Verifier si divisible par 100
 	BREQ bNeg 	; divid == 100
 	BRGT debC 	; 100 > divid
 
-debQ: 	NOP0		; Boucle do while
-	SUBA 4,i	; Soustraire 4
-	CPA 0,i
-	BRGT debQ	; divid > 0
-	BRLT bNeg	; divid < 0
-	BR bPos		; divid == 0
+debQ: 	STA temp2,d
+	ASRA
+	ASRA
+	ASLA
+	ASLA
+	CPA temp2,d
+	BREQ bPos
+	BR bNeg
 
 bNeg:	LDX 0,i
 	STX biss,d
