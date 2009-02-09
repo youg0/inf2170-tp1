@@ -17,12 +17,14 @@ debC: 	CPA cent,d	; Verifier si divisible par 100
 	CPA cent,d 
 	BREQ fin1 	;divid == 100
 	BRGT debC 	;100 > divid
-debQ: 	NOP0		; Boucle do while
-	SUBA 4,i	; Soustraire 4
-	CPA 0,i
-	BRGT debQ	; divid > 0
-	BRLT fin3	; divid < 0
-	BR fin2		; divid == 0
+debQ: 	STA temp2,d
+	ASRA
+	ASRA
+	ASLA
+	ASLA
+	CPA temp2,d
+	BREQ fin
+	BR fin1
 
 	fin: STRO msg,d
 	STOP 
