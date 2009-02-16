@@ -1,3 +1,11 @@
+; #/pep8
+; Ce programme demande a l'utilisateur d'entrer une date en format numerique
+; (JJ MM AAAA), ensuite il affiche celle-ci en remplacant le numero de mois par
+; son nom. Il affiche egalement la date du lendemain. Ce programme verifie
+; si l'annee est bissextile, si la date entree est le dernier jour du mois
+; et/ou de l'annee. Il verifie la validite des informations entrees par l'usager
+; avant de faire quelque calcul que ce soit.
+
 
 FINLIGNE:.EQUATE 0x000a
 ESPACE:	.EQUATE 32
