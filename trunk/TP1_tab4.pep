@@ -6,8 +6,6 @@
 ; et/ou de l'annee. Il verifie la validite des informations entrees par l'usager
 ; avant de faire quelque calcul que ce soit.
 
-; allo
-
 FINLIGNE:.EQUATE 0x000a
 ESPACE:	.EQUATE 32
 
