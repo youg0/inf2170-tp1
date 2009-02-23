@@ -110,12 +110,12 @@ compJm:	LDA jour,d
 	CHARO ESPACE,i		; cout << " ";
 	STRO nomMois,n		; cout << nomMois;
 	DECO annee,d		; cout << annee;
-	CHARO FINLIGNE,i	; cout < std::endl;
+	CHARO FINLIGNE,i	; cout < endl;
 	BR vJour	
 
 ; // Message d'erreur si le jour depasse le nb de jour du mois \\
 erreurJ:	STRO msgErrJ,d		; cout << "Donnee de jour erronee";
-	CHARO FINLIGNE,i	; cout << std::endl;
+	CHARO FINLIGNE,i	; cout << endl;
 	STRO msgErrK,d		; cout << "(Entrez une valeur entre 1 et ";
 	DECO jMaxV,d		; cout << jMaxV;
 	CHARO 41,i		; cout << ")";
@@ -125,7 +125,7 @@ erreurJ:	STRO msgErrJ,d		; cout << "Donnee de jour erronee";
 
 ; // Message d'erreur si le mois depasse le nombre de mois max (12) \\
 erreurM:	STRO msgErrM,d		; cout << "Donnee de mois erronee"
-	CHARO FINLIGNE,i	; cout << std::endl;
+	CHARO FINLIGNE,i	; cout << endl;
 	STRO msgErrN,d		; cout << "(Entrez une valeur entre 1 et 12)";
 	CHARO FINLIGNE,i	; cout << endl;
 	CHARO FINLIGNE,i	; cout << endl;
