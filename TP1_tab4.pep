@@ -12,13 +12,13 @@ ESPACE:	.EQUATE 32
 ;// Saisie des donnees \\
 saisie:	LDA 0,i
 	STRO msgInv,d		; cout << msgInv;
-	CHARO FINLIGNE,i	; cout << std::endl;
+	CHARO FINLIGNE,i	; cout << endl;
 	CHARO ESPACE,i		; cout << " ";
 	DECI jour,d 		; cin >> jour;
 	BREQ fin			; if (jour == 0) fin;		
 	CHARO ESPACE,i		; cout << " ";
 	DECI mois,d 		; cin >> mois;
-	CHARO ESPACE,i		; cout << std::endl;
+	CHARO ESPACE,i		; cout << endl;
 	DECI annee,d 		; cin >> annee;
 	LDA jour,d		;				
 	BRLT erreurJ		;
@@ -40,7 +40,6 @@ valid:	LDA mois,d		; Trouver indice des tableaux
 	ADDA temp,d		; (mois - 1) * 4 + (mois - 1) * 8
 	ADDA jan,i		; Ajouter l'adresse du premier element du tab
 
-	ADDA 1,i
 	STA nomMois,d		; Adresse du mois
 	
 	LDA mois,d		; Verifier si c'est fevrier pour verification bissextile
@@ -76,12 +75,12 @@ debC: 	NOP0			; do {
 	BRGT debC 		; } while (annee > 100)
 
 ; // Verifier si divisible par 4 \\
-debQ: 	STA nbJour,d	
+debQ: 	STA temp,d	
 	ASRA
 	ASRA
 	ASLA
 	ASLA
-	CPA nbJour,d		; Division entiere par 4 et multiplication par 4
+	CPA temp,d		; Division entiere par 4 et multiplication par 4
 	BREQ bPos		; if(((annee \ 4) * 4) == annee) bPos;
 	BR bNeg			; else bNeg
 
@@ -107,12 +106,12 @@ compJm:	LDA jour,d
 	CHARO ESPACE,i		; cout << " ";
 	STRO nomMois,n		; cout << nomMois;
 	DECO annee,d		; cout << annee;
-	CHARO FINLIGNE,i	; cout < std::endl;
+	CHARO FINLIGNE,i	; cout < endl;
 	BR vJour	
 
 ; // Message d'erreur si le jour depasse le nb de jour du mois \\
-erreurJ:	STRO msgErrJ,d		; cout << "Donnee de jour erronee";
-	CHARO FINLIGNE,i	; cout << std::endl;
+erreurJ:STRO msgErrJ,d		; cout << "Donnee de jour erronee";
+	CHARO FINLIGNE,i	; cout << endl;
 	STRO msgErrK,d		; cout << "(Entrez une valeur entre 1 et ";
 	DECO jMaxV,d		; cout << jMaxV;
 	CHARO 41,i		; cout << ")";
@@ -121,15 +120,15 @@ erreurJ:	STRO msgErrJ,d		; cout << "Donnee de jour erronee";
 	BR saisie
 
 ; // Message d'erreur si le mois depasse le nombre de mois max (12) \\
-erreurM:	STRO msgErrM,d		; cout << "Donnee de mois erronee"
-	CHARO FINLIGNE,i	; cout << std::endl;
+erreurM:STRO msgErrM,d		; cout << "Donnee de mois erronee"
+	CHARO FINLIGNE,i	; cout << endl;
 	STRO msgErrN,d		; cout << "(Entrez une valeur entre 1 et 12)";
 	CHARO FINLIGNE,i	; cout << endl;
 	CHARO FINLIGNE,i	; cout << endl;
 	BR saisie
 
 ; // Message d'erreur si l'annee entree n'est pas valide
-erreurA:	STRO msgErrA,d		; cout << "Donnee d'annee erronee";
+erreurA:STRO msgErrA,d		; cout << "Donnee d'annee erronee";
 	CHARO FINLIGNE,i	; cout << endl;
 	STRO msgErrB,d		; cout << "(Entrez une valeur positive)";
 	CHARO FINLIGNE,i	; cout << endl;
@@ -142,7 +141,7 @@ vJour:	LDA jour,d
 	STA jour,d		; jour += 1;
 	CPA jMaxV,d
 	BRGT dJour		; if(jour > jMaxV) djour;
-	BR affic			; 	else affic;
+	BR affic		; 	else affic;
 
 ; // Si c'est le dernier jour du mois \\
 dJour:	LDA 1,i
@@ -154,7 +153,7 @@ dJour:	LDA 1,i
 	ADDA jMjan,i		
 	CPA nomMois,d
 	BRLE chanAn		; if(indice => 11) chanAn;
-	BR affic			; 	else affic;
+	BR affic		; 	else affic;
 
 
 ; // Ajouter une annee et mettre le mois a Janvier \\
