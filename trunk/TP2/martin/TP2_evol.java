@@ -14,13 +14,18 @@ public class TP2_evol {
 
         static char [] tab;
        
-    public static int saisir (char[] tab2){
-        String chaineS;
-        int nbElem = 0;
-        int longueur = 0;
-      
+    public static String saisir (){
+        String chaineS;      
         System.out.println( "Donnez une chaÃ®ne: " );
         chaineS = Clavier.lireString();
+        
+    return chaineS;
+    }
+    
+
+    public static int traiter (String chaineS){
+        int nbElem = 0;
+        int longueur = 0;       
         longueur = chaineS.length();
         tab = enleverEspaces(longueur, chaineS.toCharArray());
         
@@ -28,6 +33,7 @@ public class TP2_evol {
         
         for ( int i = 0; i < longueur; i++ ){
             tab[i] = epurer(tab[i]);
+            System.out.println( "tab[" + i + "] : " +  tab[i]);
             nbElem ++;
             }
         
@@ -36,31 +42,31 @@ public class TP2_evol {
     }
     // Methode pour enlever les espaces et les caracteres de ponctuation
     public static char[] enleverEspaces(int n, char[] tab) {
-    	int[] notValidChars = { 39, 32, 33, 34, 39, 44, 46, 58, 59, 63 };
-    	final int nb = 10;	// Il y aura toujours 10 caracteres "invalides" (espaces, signes de pontuation);
-    	char[] newTab = new char[n];
-    	char[] finalTab;
-    	boolean found;
-    	int count = 0;
-    	
-    	for (int i = 0; i < n;i++) {
-    		found = false;    		
-    		for (int j = 0; j < nb && !found; j++) {
-    			if ((int)tab[i] == notValidChars[j])
-    				found = true;
-    		}
-    		if (!found) {
-    			newTab[count] = tab[i];
-    			count++;
-    		}
-    	}
-    	
-    	finalTab = new char[count];
+        int[] notValidChars = { 39, 32, 33, 34, 39, 44, 46, 58, 59, 63 };
+        final int nb = 10;  // Il y aura toujours 10 caracteres "invalides" (espaces, signes de pontuation);
+        char[] newTab = new char[n];
+        char[] finalTab;
+        boolean found;
+        int count = 0;
+        
+        for (int i = 0; i < n;i++) {
+            found = false;          
+            for (int j = 0; j < nb && !found; j++) {
+                if ((int)tab[i] == notValidChars[j])
+                    found = true;
+            }
+            if (!found) {
+                newTab[count] = tab[i];
+                count++;
+            }
+        }
+        
+        finalTab = new char[count];
     
-    	for (int i = 0; i < count; i++)
-    		finalTab[i] = newTab[i];
-    	
-    	return finalTab;
+        for (int i = 0; i < count; i++)
+            finalTab[i] = newTab[i];
+        
+        return finalTab;
     }
    // Methode pour enlever les accents et les majuscules. (caractere par caractere)
     public static  char epurer ( int c ){        
@@ -95,8 +101,8 @@ public class TP2_evol {
         boolean egal = true;
         System.out.println("palin: " + n);
         for(int i = 0; i <= n && egal; i++, n--){ // Analyse du tableau de caracteres
-        	System.out.println("n =" + (n - 1) + " i =" + i);
-        	System.out.println("n =" +tab[n - 1] + " i =" + tab[i]);
+            System.out.println("n =" + (n - 1) + " i =" + i);
+            System.out.println("n =" +tab[n - 1] + " i =" + tab[i]);
            if (tab[i] != tab[n - 1]) {
                egal = false;
             }
@@ -108,21 +114,24 @@ public class TP2_evol {
        
         int n = 0;
         String chaineS = "";
-        String chaineT = "";
        
-        n = saisir(tab); 
+        chaineS = saisir(); 
+        n = traiter(chaineS);
+        
         System.out.println("Apres saisir:" + n);
-        while ( n >= 0 ){
-         	System.out.println(tab);
-         	System.out.println("main: " + n);
+        while ( n > 0 ){
+            System.out.println(tab);
+            System.out.println("main: " + n);
             if ( palin ( n, tab)){
-                System.out.println( "Ceci est un palindrome." );
+                System.out.println( chaineS + " est un palindrome." );
             } else {
-                System.out.println( "Ceci n'est pas un palindrome." );
+                System.out.println( chaineS + " n'est pas un palindrome." );
             }
 
-             n = saisir(tab) - 1; 
-        }                    
+            chaineS = saisir(); 
+            n = traiter(chaineS);
+        } 
+        System.out.println( "Arrêt du programme" );
    
     } // main
    
