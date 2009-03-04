@@ -14,33 +14,44 @@ public class TP2_evol {
 
         static char [] tab;
        
+    /* Methode pour saisir unu chaine
+     * @return chaine saisie
+     */    
     public static String saisir (){
         String chaineS;      
-        System.out.println( "Donnez une chaÃ®ne: " );
+        System.out.println( "Donnez une chaine: " );
         chaineS = Clavier.lireString();
         
     return chaineS;
     }
     
-
+    /* Methode qui traite la chaine en appelant les methodes pour enlever les accents,
+     * les espaces et les signes de ponctuation de la chaine d'origine.
+     * @param chaineS chaine a traiter
+     * @return longueur de la chaine apres traitement
+     */
     public static int traiter (String chaineS){
         int nbElem = 0;
         int longueur = 0;       
         longueur = chaineS.length();
         tab = enleverEspaces(longueur, chaineS.toCharArray());
-        
         longueur = tab.length;
+
+        for ( int i = 0; i < longueur && longueur != 0; i++ ){
+        		tab[i] = epurer(tab[i]);
+        		nbElem ++;
+            	}
         
-        for ( int i = 0; i < longueur; i++ ){
-            tab[i] = epurer(tab[i]);
-            System.out.println( "tab[" + i + "] : " +  tab[i]);
-            nbElem ++;
-            }
-        
-        System.out.println("saisir: " + nbElem);
-        return nbElem;
+      return nbElem;
     }
-    // Methode pour enlever les espaces et les caracteres de ponctuation
+    
+    /* Cette methode recevra en parametre un tableau de caracteres ainsi 
+     * que sa longueur, il verifiera s'il y a des signes de ponctuation ou espaces 
+     * et les enlevera. Caracteres: ' ! " ' , . : ; ? \s
+     * @param longueur de la chaine a traiter
+     * @param chaine de caractere a traiter
+     * @return chaine de caractere apres traitement
+    */
     public static char[] enleverEspaces(int n, char[] tab) {
         int[] notValidChars = { 39, 32, 33, 34, 39, 44, 46, 58, 59, 63 };
         final int nb = 10;  // Il y aura toujours 10 caracteres "invalides" (espaces, signes de pontuation);
@@ -48,7 +59,7 @@ public class TP2_evol {
         char[] finalTab;
         boolean found;
         int count = 0;
-        
+
         for (int i = 0; i < n;i++) {
             found = false;          
             for (int j = 0; j < nb && !found; j++) {
@@ -68,7 +79,13 @@ public class TP2_evol {
         
         return finalTab;
     }
-   // Methode pour enlever les accents et les majuscules. (caractere par caractere)
+
+   /* Cette methode recevra en parametre le caractere a traiter, il verifiera si c'est
+    * une majuscule ou un caractere accentue, si tel est le cas, il retournera le meme
+    * caractere dans sa forme normale.
+    * @param caractere a verifier et remplacer (s'il le faut)
+    * @return caractere apres traitement
+    */
     public static  char epurer ( int c ){        
        
             if (( c >= 65 && c <= 90 ) || ( c >= 192  &&  c <= 223 )) { // Conversion a minuscule
@@ -96,15 +113,19 @@ public class TP2_evol {
         }
      
     
-    // Methode qui verifie si la chaine est un palindrome
+    
+    /* Cette methode recoit en parametre une chaine de caractere sous
+     * forme de tableau de caracteres, il verifiera si celui-ci est un
+     * palindrome et retournera true si tel es le cas.
+     * @param longueur de la chaine de caractere
+     * @param chaine de caractere a traiter
+     * @return true si le tableau est un palindrome
+    */
     public static boolean palin ( int n, char [] tab){
         boolean egal = true;
-        System.out.println("palin: " + n);
         for(int i = 0; i <= n && egal; i++, n--){ // Analyse du tableau de caracteres
-            System.out.println("n =" + (n - 1) + " i =" + i);
-            System.out.println("n =" +tab[n - 1] + " i =" + tab[i]);
-           if (tab[i] != tab[n - 1]) {
-               egal = false;
+            if (tab[i] != tab[n - 1]) {
+            	egal = false;
             }
         }
         return egal;
@@ -113,24 +134,20 @@ public class TP2_evol {
     public static void main (String[] params) {
        
         int n = 0;
-        String chaineS = "";
-       
-        chaineS = saisir(); 
-        n = traiter(chaineS);
+        String chaineS = new String();
+      
+        do {
+        	chaineS = saisir(); 
+        	n = traiter(chaineS);
+        	if (n != 0)
+        		System.out.println(chaineS + (palin(n,tab)?" est un palindrome":" n'est pas un palindrome"));
+        	else {
+        		System.out.println("Cette chaine ne contient que des caracteres invalides, veuillez reessayer");
+        		n = 1;
+        	}
+        }
+        while (n > 0);
         
-        System.out.println("Apres saisir:" + n);
-        while ( n > 0 ){
-            System.out.println(tab);
-            System.out.println("main: " + n);
-            if ( palin ( n, tab)){
-                System.out.println( chaineS + " est un palindrome." );
-            } else {
-                System.out.println( chaineS + " n'est pas un palindrome." );
-            }
-
-            chaineS = saisir(); 
-            n = traiter(chaineS);
-        } 
         System.out.println( "Arrêt du programme" );
    
     } // main
