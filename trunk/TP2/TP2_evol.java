@@ -42,7 +42,7 @@ public class TP2_evol {
         		nbElem ++;
             	}
         
-      return nbElem;
+      return (nbElem == 0?-1:nbElem);
     }
     
     /* Cette methode recevra en parametre un tableau de caracteres ainsi 
@@ -138,10 +138,12 @@ public class TP2_evol {
       
         do {
         	chaineS = saisir(); 
-        	n = traiter(chaineS);
-        	if (n != 0)
+        	if (chaineS.equals("0")) n = 0; 
+        	else n = traiter(chaineS);
+        	
+        	if (n > 0)
         		System.out.println(chaineS + (palin(n,tab)?" est un palindrome":" n'est pas un palindrome"));
-        	else {
+        	else if (n == -1) {
         		System.out.println("Cette chaine ne contient que des caracteres invalides, veuillez reessayer");
         		n = 1;
         	}
