@@ -1,11 +1,13 @@
+;----------- ENTREE DE CARACTERES -----------
+; IL FAUT SETTER nblet POUR LE NOMBRE DE CARACTERES (DEFAUT: 5)
 		LDX	0,i
+	while4:	CPX	nblet,d
+		BRGE	fin4
 		CHARI	mot,x
 		ADDX	1,i
-		CHARI	mot,x
-		ADDX	1,i
-		CHARI	mot,x
-		ADDX	1,i
-		CHARI	mot,x
+		BR	while4
+	fin4:	NOP0	
+;----------- FIN ENTREE ---------------------
 
 		LDA 	nblet,d
 		STA 	-10,s	; Empiler taille
@@ -20,15 +22,25 @@
 		SUBSP 	10,i	
 		CALL	DelInv
 		ADDSP	10,i
-		CHARO 	'-',i
-
-		LDA	motConv,d
 		
+;----------- SORTIE DE LA CHAINE APRES TRAITEMENT -----------
+		CHARO 	'\n',i		
+		LDX	0,i
+	while5:	CPX	nbletN,d
+		BRGE	fin5
+		CHARO	motConv,x
+		ADDX	1,i
+		BR	while5
+	fin5:	NOP0	
+		CHARO	'\n',i
+		DECO	nbletN,d
+;----------- FIN DE LA SORTIE APRES TRAITEMENT ---------------
+
 		STOP
 
 	mot:	.BLOCK	20
 	motConv:.BLOCK	20
-	nblet:	.WORD	4
+	nblet:	.WORD	5
 	nbletN:	.WORD	0
 	invalid:.BYTE	32	;\s
 		.BYTE	33	;'!'
@@ -54,25 +66,26 @@
 ;		-IMPLÉMENTER LA VARIABLE TaillB
 ;		-AJOUTER AU PROGRAMME PRINCIPAL
 
-	IndexT:	.EQUATE 0	; Index de la table de caractere
+	Temp:	.EQUATE 0	; Variable Temporaire (usage a boucle3)
 	IndexI:	.EQUATE 2	; Index de la table d'invalides
-	IndexB:	.EQUATE	4	; Index de la chaine a retourner
-	VieuxX:	.EQUATE	6	; Vieux contenu du registre X
-	VieuxA:	.EQUATE	8	; Vieux contenu du registre A
-	Accum:	.EQUATE 10	; Accumulateur de la premiere boucle
-	Carac:	.EQUATE	12
+	VieuxX:	.EQUATE	4	; Vieux contenu du registre X
+	VieuxA:	.EQUATE	6	; Vieux contenu du registre A
+	Accum:	.EQUATE 8	; Accumulateur de la premiere boucle
+	Carac:	.EQUATE	10	; Caractere a analyser
 
-	AddRet:	.EQUATE 14	; Adresse de retour
+	AddRet:	.EQUATE 12	; Adresse de retour
 
-	Taille:	.EQUATE	16	; Taille de la chaine a traiter
-	TaillB:	.EQUATE	18	; Taille de la chaine apres traitement
-	Inval:	.EQUATE	20	; Adresse du debut du tab. de caracteres invalides
-	ChainA:	.EQUATE	22	; Adresse de la chaine a traiter
-	ChainB:	.EQUATE	24	; Adresse ou retourner la chaine apres traitement
+	Taille:	.EQUATE	14	; Taille de la chaine a traiter
+	TaillB:	.EQUATE	16	; Taille de la chaine apres traitement
+	Inval:	.EQUATE	18	; Adresse du debut du tab. de caracteres invalides
+	ChainA:	.EQUATE	20	; Adresse de la chaine a traiter
+	ChainB:	.EQUATE	22	; Adresse ou retourner la chaine apres traitement
 
-	DelInv:	SUBSP	14,i	
+	DelInv:	SUBSP	12,i	
 		STA	VieuxA,d
 		STX	VieuxX,d
+		LDA	8,i
+		STA	Temp,s	; On utilisera cette variable comme var temporaire
 		LDX	0,i
 		STX	Accum,s
 		STX	IndexI,s
@@ -94,6 +107,17 @@
 		BR	while2		; sinon on compare avec un autre char inval
 
 	fin2:	LDA	Carac,s		; Le char n'est PAS Invalide
+		LDX	0,i
+	bouc3:	CPX	Temp,s	; boucle pour bouger de 1 octet vers la gauche
+		BRGE	fin3		; if (x < 8)
+		ADDX	1,i
+		ASLA
+		BR bouc3
+	fin3:	NOP0
+		LDX	TaillB,sf	; Taille chaine += 1
+		ADDX	1,i			
+		STX	TaillB,sf
+
 		LDX	IndexI,s	; On l'ajoute donc a chainB
 		STA	ChainB,sxf
 		ADDX	1,i
@@ -103,6 +127,6 @@
 	fin1:	NOP0
 		LDX	VieuxX,s
 		LDA	VieuxA,s		
-		ADDSP 	14,i
+		ADDSP 	12,i
 		RET0
 		.END		
