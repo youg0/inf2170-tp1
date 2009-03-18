@@ -1,35 +1,52 @@
 
-		LDA mot,i
-		STA -4,s
-		LDA 10,i
-		STA -2,s
-		SUBSP 4,i
-		STRO msgSai,d
-		CALL LirChain
-		LDA 0,s
-		STA nblet,d
-		ADDSP 2,i
-		DECO nblet,d
-		
-		
-		LDA nblet,d
-		STA -8,s
-		LDA ASCII,i
-		STA -6,s
-		LDA mot,d
-		STA -4,s
-		LDA motConv,d
-		STA -2,s
-		SUBSP 8,i
-		CALL MinusAcc
-		CHARO motConv,d
-		
+		LDA 	mot,i
+		STA 	-4,s	; Empiler l'adresse de mot
+		LDA 	20,i
+		STA 	-2,s	; Empiler le nombre 20 (taille)
+		SUBSP 	4,i
+		STRO 	msgSai,d
+		CALL 	LirChain
+		LDA 	0,s		; Désempiler la taille de la chaine entrée
+		STA 	nblet,d
+		ADDSP	2,i	; Nettoyer pile
 
+		
+		LDA 	nblet,d
+		STA 	-8,s	; Empiler taille
+		LDA 	ASCII,i
+		STA 	-6,s	; Empiler addresse des caracteres accentués
+		LDA 	mot,i
+		STA 	-4,s	; Empiler addresse de début de chainer a traiter
+		LDA 	motConv,i
+		STA 	-2,s	; Empiler addresse où retourner chaine traitée
+		SUBSP 	8,i	
+		CALL	 MinusAcc
+	
+;--------- TESTS ---	---------
+	
+		LDX 	0,i
+	boucle:	CPX 	nblet,d		
+		BRGE	finBouc
+		CHARO	mot,x
+		ADDX	1,i
+		BR 	boucle
+	finBouc:CHARO	'\n',i
+		
+		LDX 	0,i
+	bouc1:	CPX 	nblet,d		
+		BRGE 	finBou1
+		CHARO 	motConv,x
+		ADDX 	1,i
+		BR 	bouc1
+	finBou1:CHARO 	'\n',i
+
+;--------- FIN TESTS ------------
+	
 
 		STOP
 
-	mot:	.EQUATE 10
-	motConv:.EQUATE	10
+	mot:	.BLOCK 20
+	motConv:.BLOCK 20
 	nblet:	.WORD 0
 	msgSai:	.ASCII "Veuillez entre une chaine: \x00"
 	
