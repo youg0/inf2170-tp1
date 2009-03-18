@@ -61,10 +61,6 @@
 ;			Adresse de retour de la taille de la chaine traitee
 ;			Adresse des caracteres consideres invalides
 ;
-;	TODO:	-RÉGLER LE BUG QUI FAIT QUE LORSQU'IL Y A PLUS D'UNE LETTRE
-;		 IL NE RETOURNE PAS BIEN ChainB
-;		-IMPLÉMENTER LA VARIABLE TaillB
-;		-AJOUTER AU PROGRAMME PRINCIPAL
 
 	Temp:	.EQUATE 0	; Variable Temporaire (usage a boucle3)
 	IndexI:	.EQUATE 2	; Index de la table d'invalides
