@@ -351,7 +351,7 @@
 	         STBYTEA addrBuf,sxf;    Buf[indice] = caractere; 
 	         ADDX    1,i        ;    indice++;
          CPX     taille,s   ;    if(indice > taille) break;
-	         BRLE    EncorL     ;  }
+	         BRLT    EncorL     ;  } // MODIFICATION DU SOUS-PROGRAME ORIGINAL ( BRLE => BRLT )
 	FiniL:   STX     taille,s   ;  nombre de caracteres lus
 	         LDA     retour,s   ;  adresse retour
 	         STA     addrBuf,s  ;  deplacee
