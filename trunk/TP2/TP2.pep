@@ -102,7 +102,7 @@
 
 		STOP
 	
-	mot:	.BLOCK 	20	; Chaine d'origine
+	mot:	.BLOCK 	255	; Chaine d'origine
 	motConv:.BLOCK 	20	; Chaine apres enlever les accents
 	motClea:.BLOCK 	20	; Chaine apres enlever les espaces et ponctuation
 	nblet:	.WORD 	0	; Taille de chaine d'origine
@@ -348,10 +348,17 @@
 	         LDBYTEA car,s      ;
 	         CPA     0xA,i      ;    if(caractere == fin de ligne) 
 	         BREQ    FiniL      ;      break;
+		 ;====================================================
+		 ;// AJOUT AU SOUS-PROGRAME ORIGINAL
+		 ;// POUR CORRIGER UN BUG AVEC LE MODE BATCH DE PEP8
+		 ;----------------------------------------------------
+	         CPA     0x0,i      ;    if(caractere == 0X00) 
+	         BREQ    FiniL      ;      break;
+		 ;====================================================
 	         STBYTEA addrBuf,sxf;    Buf[indice] = caractere; 
 	         ADDX    1,i        ;    indice++;
          CPX     taille,s   ;    if(indice > taille) break;
-	         BRLT    EncorL     ;  } // MODIFICATION DU SOUS-PROGRAME ORIGINAL ( BRLE => BRLT )
+	         BRLE    EncorL     ;  } 
 	FiniL:   STX     taille,s   ;  nombre de caracteres lus
 	         LDA     retour,s   ;  adresse retour
 	         STA     addrBuf,s  ;  deplacee
