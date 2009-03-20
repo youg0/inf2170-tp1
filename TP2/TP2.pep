@@ -1,17 +1,19 @@
 
-		LDA 	mot,i
+	debut:	LDA 	mot,i
 		STA 	-4,s	; Empiler l'adresse de mot
 		LDA 	20,i
 		STA 	-2,s	; Empiler le nombre 20 (taille)
 		SUBSP 	4,i
 		STRO 	msgSai,d
 		CALL 	LirChain
-		LDA 	0,s		; Désempiler la taille de la chaine entrée
+		LDA 	0,s	; Désempiler la taille de la chaine entrée
 		STA 	nblet,d
 		ADDSP	2,i	; Nettoyer pile
 
 		
 		LDA 	nblet,d
+		BREQ	f1n	; Si taille == 0, fin du programme
+
 		STA 	-8,s	; Empiler taille
 		LDA 	ASCII,i
 		STA 	-6,s	; Empiler addresse des caracteres accentués
@@ -36,8 +38,28 @@
 		CALL	DelInv
 		ADDSP	10,i
 
+		LDA	1,i
+		STA	palin,d
+		CPA	nbletN,d ; S'il y a une seule lettre, c'est un palindrome
+		BREQ	sortie
+		
+		
+		LDA	0,i	; A = 0
+		LDA	motClea,i; 
+		STA 	-4,s	; Empiler l'adresse de la chaine
+		LDA 	nbletN,d
+		STA 	-2,s	; Empiler la taille de la chaine
+		SUBSP 	4,i
+		CALL	VerPal	; Appeler le sous-programme : "Vrifier Palindromes"
+		LDA	0,s
+		STA	palin,d
+		ADDSP	2,s
+	
+
 ;--------- TESTS ---	---------
+	sortie:	NOP0
 		CHARO	'\n',i
+		STRO	msgAS,d	
 		LDX 	0,i
 	bou1:	CPX 	nblet,d		
 		BRGE	finBou1
@@ -45,7 +67,7 @@
 		ADDX	1,i
 		BR 	bou1
 	finBou1:CHARO	'\n',i
-
+		STRO	msgAA,d
 		LDX 	0,i
 	bou2:	CPX 	nblet,d		
 		BRGE	finBou2
@@ -53,7 +75,7 @@
 		ADDX	1,i
 		BR 	bou2
 	finBou2:CHARO	'\n',i
-		
+		STRO	msgAE,d		
 		LDX 	0,i
 	bou3:	CPX 	nbletN,d		
 		BRGE 	finBou3
@@ -61,19 +83,40 @@
 		ADDX 	1,i
 		BR 	bou3
 	finBou3:CHARO 	'\n',i
+		STRO	msgAL,d
 		DECO	nbletN,d
+		CHARO	'\n',i
+		STRO	msgAP,d
+		LDA	palin,d
+		BREQ	npal
+	pali:	CHARO	'O',i
+		BR	prefin
+	npal:	CHARO	'N',i		
+
+	prefin:	BR	debut		; Retourner au début
+
+	f1n:	STRO	msgFI,d
+
 
 ;--------- FIN TESTS ------------
 
 		STOP
-
+	
 	mot:	.BLOCK 	20	; Chaine d'origine
 	motConv:.BLOCK 	20	; Chaine apres enlever les accents
 	motClea:.BLOCK 	20	; Chaine apres enlever les espaces et ponctuation
 	nblet:	.WORD 	0	; Taille de chaine d'origine
 	nbletN:	.WORD	0	; Taille de la chaine apres traitement
+	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
 
-	msgSai:	.ASCII "Veuillez entre une chaine: \x00"
+	msgSai:	.ASCII 	"Veuillez entrer une chaine: \x00"
+	msgAS:	.ASCII	"Chaine après saisie: \x00"
+	msgAA:	.ASCII	"Chaine sans accent: \x00"
+	msgAE:	.ASCII	"Chaine sans espaces/ponc.: \x00"
+	msgAL:	.ASCII	"Longueur de la chaine finale: \x00"
+	msgAP:	.ASCII	"Est-ce un palindrome? \x00"
+	msgFI:	.ASCII	"Arrêt du programme. \x00"
+	
 	invalid:.BYTE	32	;\s
 		.BYTE	33	;'!'
 		.BYTE	34	;'"'
@@ -83,6 +126,80 @@
 		.BYTE	58	;':'
 		.BYTE	59	;';'
 		.BYTE	63	;'?'
+
+;------- Vrifier palindromes
+; Lit une chaine de caracteres ASCII et compare l'galit entre le cractre n et 
+; le caratre taille - n. Si l'galit persiste pour la moti du mot, 
+; c'est un palidrome. 
+	
+	;VerPal{
+
+	VPregX:  .EQUATE 0	;Sauvegarder la valeur de X
+	VPregA:  .EQUATE 2	;Sauvegarder la valeur de A
+	VPIndFn: .EQUATE 4	;Index  de la fin de la chaine ( n - x++ )
+	VPIndDb: .EQUATE 6	;Index qui part du dbut de la chaine
+	VPTmpCd: .EQUATE 8	;Caractre  l'index VPIndDb
+	VPTmpCf: .EQUATE 10	;Caractre  l'index VPIndFN
+	VPAret:	 .EQUATE 12	;Adresse de retour
+	VPCha: 	 .EQUATE 14     ;Chaine traite
+	VPLong:  .EQUATE 16     ;Longueur de la chaine 
+	VPVret:  .EQUATE 18 	;Valeur de retour ( 1=oui, 0=non )
+	VPNAret: .EQUATE 16 	;Nouvelle adresse de retour (lorsqu'on vide)
+	                            
+	VerPal:	 SUBSP   12,i		;Espace local
+	         STA     VPregA,s	;Sauvegarde A
+         	 STX     VPregX,s 	;Sauvegarde X
+		 LDX     0,i		;Nul			
+		 LDX	 VPLong,s	;
+		 SUBX	 1,i		;				 
+		 STX	 VPIndFn,s	;VPIndFn = VPLong - 1
+
+		 LDX     0,i         	;Nul
+	         STX     VPIndDb,s    	;Index du dbut  = 0
+	         LDA     0,i         	;Nul
+		 
+
+					;do{ //while( VPIndDb != VPIndFn )
+	VPTest:  LDX     VPIndDb,s	;	
+		 LDBYTEA VPCha,sxf	;
+ 		 STA 	 VPTmpCd,s	;VPTmpCd = VPCha[VPIndDb]
+
+		 LDA	 0,i		;
+		 LDX	 0,i		;	 
+		 LDX	 VPIndFn,s	;
+		 LDBYTEA VPCha,sxf	;
+		 STA 	 VPTmpCf,s	;VPTmpCd = VPCha[VPIndDb]
+		 
+		 CPA	 VPTmpCd,s	;if( VPTmpCd != VPTmpCf ){
+	         BRNE    FinNeg		;break
+
+		 LDX	 0,i		;
+		 LDX	 VPIndFn,s	;
+		 SUBX	 1,i		;
+		 STX	 VPIndFn,s	; VPIndDb--
+		 CPX	 VPIndDb,s	;
+		 BREQ	 FinPos		; }//end while =>( VPIndFn == VPIndDb )
+		 LDX	 VPIndDb,s	;
+		 ADDX	 1,i		;
+		 STX	 VPIndDb,s	; VPIndDb++
+		 CPX	 VPIndFn,s
+		 BREQ	 FinPos		; }//end while =>( VPIndDb == VPIndFn )		 
+  	         BR    	 VPTest     	; } while ( VPIndDb != VPIndFn );	
+
+	FinPos:  LDA	 1,i		;
+		 STA     VPVret,s      	; C'est un palindrome! Valeur de retour = 1
+		 BR	 VPsortie	;
+	FinNeg:  LDA	 0,i		;
+		 STA     VPVret,s       ; Ce n'est pas un palindrome! Valeur de retour = 0
+
+	VPsortie:LDA     VPAret,s   	;  
+	         STA     VPNAret,s   	;  nouvelle adresse retour = adresse retour
+	         LDA     VPregA,s     	;  restaure A
+	         LDX     VPregX,s     	;  restaure X
+         	 ADDSP   VPNAret,i      ;  nettoyer pile
+
+	         RET0               ;}// VerPal
+
 	
 ; Sous-programme qui enleve les espaces et signes de ponctuation d'une chaine 
 ; entree en parametre. Il retournera la chaine a une adresse qui aura ete
@@ -242,6 +359,8 @@
 	         LDX     regX,s     ;  restaure X
          ADDSP   8,i        ;  nettoyer pile
 	         RET0               ;}// LireChaine
+
+
 
 
 ; table de conversion des codes ASCII en lettres minuscules non accentuees
