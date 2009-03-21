@@ -1,59 +1,63 @@
+;Presentation du Logiciel ( A faire )
 
-	debut:	LDA 	mot,i
-		STA 	-4,s	; Empiler l'adresse de mot
-		LDA 	20,i
-		STA 	-2,s	; Empiler le nombre 20 (taille)
-		SUBSP 	4,i
-		STRO 	msgSai,d
-		CALL 	LirChain
-		LDA 	0,s	; Désempiler la taille de la chaine entrée
-		STA 	nblet,d
-		ADDSP	2,i	; Nettoyer pile
+	T_MAX:.EQUATE 128; Taille maximum de la chaine saisie (155 + 1)/2
+	
+	debut:	NOP0	; Appel du s. prog. de LECTURE CHAINE:
 
+		LDA 	mot,i	 	;
+		STA 	-4,s	 	; Empiler l'adresse de mot
+		LDA 	T_MAX,i	 	;
+		STA 	-2,s	 	; Empiler T_MAX
+		SUBSP 	4,i	 	;
+		STRO 	msgSai,d 	; Message d'invite
+		CALL 	LirChain 	;
+		LDA 	0,s	 	; Desempiler la taille de la chaine entree
+		STA 	nblet,d	 	;
+		ADDSP	2,i	 	; Nettoyer pile
+
+		LDA 	nblet,d	 	;
+		BREQ	f1n	 	; Si taille == 0, fin du programme
+
+	MinAcc:	NOP0	; Appel du s. prog. qui met en MINUSCULES SANS ACCENTS:	
+
+		STA 	-8,s	 	; Empiler taille
+		LDA 	ASCII,i	 	;
+		STA 	-6,s	 	; Empiler addresse des caracteres accentues
+		LDA 	mot,i	 	;
+		STA 	-4,s		; Empiler addresse de debut de chainer a traiter
+		LDA 	motConv,i	;
+		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
+		SUBSP 	8,i	 	;	
+		CALL	 MinusAcc	;
+
+	EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
+
+		LDA 	nblet,d	 	;
+		STA 	-10,s	 	; Empiler taille
+		LDA	nbletN,i 	;
+		STA	-8,S	 	; 
+		LDA 	invalid,i	;
+		STA 	-6,s	 	; Empiler addresse des caracteres accentues
+		LDA 	motConv,i	;
+		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
+		LDA 	motClea,i	;
+		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
+		SUBSP 	10,i	 	;	
+		CALL	DelInv	 	;
+		ADDSP	10,i	 	;
+
+	Palin:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
 		
-		LDA 	nblet,d
-		BREQ	f1n	; Si taille == 0, fin du programme
-
-		STA 	-8,s	; Empiler taille
-		LDA 	ASCII,i
-		STA 	-6,s	; Empiler addresse des caracteres accentués
-		LDA 	mot,i
-		STA 	-4,s	; Empiler addresse de début de chainer a traiter
-		LDA 	motConv,i
-		STA 	-2,s	; Empiler addresse où retourner chaine traitée
-		SUBSP 	8,i	
-		CALL	 MinusAcc
-
-		LDA 	nblet,d
-		STA 	-10,s	; Empiler taille
-		LDA	nbletN,i
-		STA	-8,S	;
-		LDA 	invalid,i
-		STA 	-6,s	; Empiler addresse des caracteres accentués
-		LDA 	motConv,i
-		STA 	-4,s	; Empiler addresse de début de chainer a traiter
-		LDA 	motClea,i
-		STA 	-2,s	; Empiler addresse où retourner chaine traitée
-		SUBSP 	10,i	
-		CALL	DelInv
-		ADDSP	10,i
-
-		LDA	1,i
-		STA	palin,d
-		CPA	nbletN,d ; S'il y a une seule lettre, c'est un palindrome
-		BREQ	sortie
-		
-		
-		LDA	0,i	; A = 0
-		LDA	motClea,i; 
-		STA 	-4,s	; Empiler l'adresse de la chaine
-		LDA 	nbletN,d
-		STA 	-2,s	; Empiler la taille de la chaine
-		SUBSP 	4,i
-		CALL	VerPal	; Appeler le sous-programme : "Vrifier Palindromes"
-		LDA	0,s
-		STA	palin,d
-		ADDSP	2,s
+		LDA	0,i	 	; A = 0
+		LDA	motClea,i	; 
+		STA 	-4,s	 	; Empiler l'adresse de la chaine
+		LDA 	nbletN,d 	;
+		STA 	-2,s	 	; Empiler la taille de la chaine
+		SUBSP 	4,i	 	;
+		CALL	VerPal	 	; Appeler le sous-programme : "Vrifier Palindromes"
+		LDA	0,s	 	;
+		STA	palin,d	 	;
+		ADDSP	2,s	 	;
 	
 
 ;--------- TESTS ---	---------
@@ -103,8 +107,8 @@
 		STOP
 	
 	mot:	.BLOCK 	255	; Chaine d'origine
-	motConv:.BLOCK 	20	; Chaine apres enlever les accents
-	motClea:.BLOCK 	20	; Chaine apres enlever les espaces et ponctuation
+	motConv:.BLOCK 	255	; Chaine apres enlever les accents
+	motClea:.BLOCK 	255	; Chaine apres enlever les espaces et ponctuation
 	nblet:	.WORD 	0	; Taille de chaine d'origine
 	nbletN:	.WORD	0	; Taille de la chaine apres traitement
 	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
@@ -175,6 +179,7 @@
 
 		 LDX	 0,i		;
 		 LDX	 VPIndFn,s	;
+		 BRLE	 FinPos		; La taille est alors de 1 et donc c'est un palindrome.
 		 SUBX	 1,i		;
 		 STX	 VPIndFn,s	; VPIndDb--
 		 CPX	 VPIndDb,s	;
