@@ -3,13 +3,16 @@
 	T_MAX:.EQUATE 128; Taille maximum de la chaine saisie (155 + 1)/2
 	
 	debut:	NOP0	; Appel du s. prog. de LECTURE CHAINE:
-
+			
+		STRO 	msgInv,d	; Message d'invite
+		LDA 	0,i
+		STA 	mot,d	 	;	
 		LDA 	mot,i	 	;
 		STA 	-4,s	 	; Empiler l'adresse de mot
 		LDA 	T_MAX,i	 	;
 		STA 	-2,s	 	; Empiler T_MAX
 		SUBSP 	4,i	 	;
-		STRO 	msgSai,d 	; Message d'invite
+		;STRO 	msgSai,d 	; Message d'invite
 		CALL 	LirChain 	;
 		LDA 	0,s	 	; Desempiler la taille de la chaine entree
 		STA 	nblet,d	 	;
@@ -30,74 +33,96 @@
 		SUBSP 	8,i	 	;	
 		CALL	 MinusAcc	;
 
-	EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
-
-		LDA 	nblet,d	 	;
-		STA 	-10,s	 	; Empiler taille
-		LDA	nbletN,i 	;
-		STA	-8,S	 	; 
-		LDA 	invalid,i	;
-		STA 	-6,s	 	; Empiler addresse des caracteres accentues
-		LDA 	motConv,i	;
-		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
-		LDA 	motClea,i	;
-		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
-		SUBSP 	10,i	 	;	
-		CALL	DelInv	 	;
-		ADDSP	10,i	 	;
+	;EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
+;
+;		LDA 	nblet,d	 	;
+;		STA 	-10,s	 	; Empiler taille
+;		LDA	nbletN,i 	;
+;		STA	-8,S	 	; 
+;		LDA 	invalid,i	;
+;		STA 	-6,s	 	; Empiler addresse des caracteres accentues
+;		LDA 	motConv,i	;
+;		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
+;		LDA 	motClea,i	;
+;		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
+;		SUBSP 	10,i	 	;	
+;		CALL	DelInv	 	;
+;		ADDSP	10,i	 	;
 
 	Palin:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
 		
 		LDA	0,i	 	; A = 0
-		LDA	motClea,i	; 
+		LDA	motConv,i	; 
 		STA 	-4,s	 	; Empiler l'adresse de la chaine
-		LDA 	nbletN,d 	;
+		LDA 	nblet,d 	;
 		STA 	-2,s	 	; Empiler la taille de la chaine
 		SUBSP 	4,i	 	;
 		CALL	VerPal	 	; Appeler le sous-programme : "Vrifier Palindromes"
 		LDA	0,s	 	;
 		STA	palin,d	 	;
 		ADDSP	2,s	 	;
+
+	Affich:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
+
+		LDA	palin,d
+		SUBA	1,i
+		DECO	palin,d
+		ASLA			; x2
+		ASLA			; x4
+		STA	palin,d		; x4
+		ASLA			; x8
+		ADDA	palin,d		; +x12
+		ASLA	
+		STA 	palin,d		; +x24
+		ADDA 	msgPal,i	; +x28
+
+		STA	palin,d		; 
+		CHARO	' ',i
+		STRO	mot,d
+		STRO 	palin,n	
+
+	prefin:	BR	debut	
 	
 
 ;--------- TESTS ---	---------
-	sortie:	NOP0
-		CHARO	'\n',i
-		STRO	msgAS,d	
-		LDX 	0,i
-	bou1:	CPX 	nblet,d		
-		BRGE	finBou1
-		CHARO	mot,x
-		ADDX	1,i
-		BR 	bou1
-	finBou1:CHARO	'\n',i
-		STRO	msgAA,d
-		LDX 	0,i
-	bou2:	CPX 	nblet,d		
-		BRGE	finBou2
-		CHARO	motConv,x
-		ADDX	1,i
-		BR 	bou2
-	finBou2:CHARO	'\n',i
-		STRO	msgAE,d		
-		LDX 	0,i
-	bou3:	CPX 	nbletN,d		
-		BRGE 	finBou3
-		CHARO 	motClea,x
-		ADDX 	1,i
-		BR 	bou3
-	finBou3:CHARO 	'\n',i
-		STRO	msgAL,d
-		DECO	nbletN,d
-		CHARO	'\n',i
-		STRO	msgAP,d
-		LDA	palin,d
-		BREQ	npal
-	pali:	CHARO	'O',i
-		BR	prefin
-	npal:	CHARO	'N',i		
-
-	prefin:	BR	debut		; Retourner au début
+;	sortie:	NOP0
+;		CHARO	'\n',i
+;		STRO	msgAS,d	
+;		LDX 	0,i
+;	bou1:	CPX 	nblet,d		
+;		BRGE	finBou1
+;		CHARO	mot,x
+;		ADDX	1,i
+;		BR 	bou1
+;	finBou1:CHARO	'\n',i
+;		STRO	msgAA,d
+;		LDX 	0,i
+;	bou2:	CPX 	nblet,d		
+;		BRGE	finBou2
+;;		CHARO	motConv,x
+;		ADDX	1,i
+;		BR 	bou2
+;	finBou2:CHARO	'\n',i
+;		STRO	msgAE,d		
+;		LDX 	0,i
+;	bou3:	CPX 	nbletN,d		
+;		BRGE 	finBou3
+;		CHARO 	motClea,x
+;		ADDX 	1,i
+;		BR 	bou3
+;	finBou3:CHARO 	'\n',i
+;		STRO	msgAL,d
+;		DECO	nbletN,d
+;		CHARO	'\n',i
+;		STRO	msgAP,d
+;		LDA	palin,d
+;;		BREQ	npal
+;	pali:	CHARO	'O',i
+;		BR	prefin
+;	npal:	CHARO	'N',i		
+;
+;
+;	prefin:	BR	debut		; Retourner au début
 
 	f1n:	STRO	msgFI,d
 
@@ -112,6 +137,11 @@
 	nblet:	.WORD 	0	; Taille de chaine d'origine
 	nbletN:	.WORD	0	; Taille de la chaine apres traitement
 	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
+
+	
+	msgInv:	.ASCII 	"\nDonnez une chaine:        \x00"
+	msgNPa:	.ASCII 	" n'est pas un palindrome. \n\x00"
+	msgPal:	.ASCII 	" est un palindrome.       \n\x00"
 
 	msgSai:	.ASCII 	"Veuillez entrer une chaine: \x00"
 	msgAS:	.ASCII	"Chaine après saisie: \x00"
@@ -409,21 +439,21 @@ ASCII:.BYTE 0
       .BYTE 29
       .BYTE 30
       .BYTE 31
-      .BYTE 32
-      .BYTE 33
-      .BYTE 34
+      .BYTE 32;32
+      .BYTE 32;33
+      .BYTE 32;34
       .BYTE 35
       .BYTE 36
       .BYTE 37
       .BYTE 38
-      .BYTE 39
+      .BYTE 32;39
       .BYTE 40
       .BYTE 41
       .BYTE 42
       .BYTE 43
-      .BYTE 44
+      .BYTE 32;44
       .BYTE 45
-      .BYTE 46
+      .BYTE 32;46
       .BYTE 47
       .BYTE 48
       .BYTE 49
@@ -435,12 +465,12 @@ ASCII:.BYTE 0
       .BYTE 55
       .BYTE 56
       .BYTE 57
-      .BYTE 58
-      .BYTE 59
+      .BYTE 32;58
+      .BYTE 32;59
       .BYTE 60
       .BYTE 61
       .BYTE 62
-      .BYTE 63
+      .BYTE 32;63
       .BYTE 64
       .BYTE 97     ; A
       .BYTE 98     ; B
