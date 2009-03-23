@@ -39,7 +39,6 @@
 	debut:	NOP0	; Appel du s. prog. de LECTURE CHAINE:
 			
 		STRO 	msgInv,d	; Message d'invite
-		LDA 	0,i
 		STA 	mot,d	 	;	
 		LDA 	mot,i	 	;
 		STA 	-4,s	 	; Empiler l'adresse de mot
@@ -55,7 +54,21 @@
 		LDA 	nblet,d	 	;
 		BREQ	f1n	 	; Si taille == 0, fin du programme
 
-	MinAcc:	NOP0	; Appel du s. prog. qui met en MINUSCULES SANS ACCENTS:	
+		LDX 	0,i		; x = 0
+
+;		==========================================================
+		CODE POUR AFFICHER CORRECTEMENT EN MOE BATCH:;ERROR: Invalid Mnemonic.
+		----------------------------------------------------------;ERROR: Symbol, instruction, or dot command expected.
+	bou:	NOP0			; Afficher es lettres de "mot"
+		CPX	nblet,d		; for ( int x = 0; x < nblet ){
+		BRGE	MinAcc		; break finBou1
+		CHARO	mot,x		;
+		ADDX	1,i		; x++
+		BR 	bou		;
+		==========================================================;ERROR: Invalid syntax.
+
+	MinAcc:	NOP0	; Appel du s. prog. qui met en MINUSCULES SANS ACCENTS:
+		CHARO	'\n',i	
 
 		STA 	-8,s	 	; Empiler taille
 		LDA 	ASCII,i	 	;
@@ -67,26 +80,30 @@
 		SUBSP 	8,i	 	;	
 		CALL	 MinusAcc	;
 
-	;EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
-;
-;		LDA 	nblet,d	 	;
-;		STA 	-10,s	 	; Empiler taille
-;		LDA	nbletN,i 	;
-;		STA	-8,S	 	; 
-;		LDA 	invalid,i	;
-;		STA 	-6,s	 	; Empiler addresse des caracteres accentues
-;		LDA 	motConv,i	;
-;		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
-;		LDA 	motClea,i	;
-;		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
-;		SUBSP 	10,i	 	;	
-;		CALL	DelInv	 	;
-;		ADDSP	10,i	 	;
+	EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
+
+		LDA 	nblet,d	 	;
+		STA 	-10,s	 	; Empiler taille
+		LDA	nbletN,i 	;
+		STA	-8,S	 	; 
+		LDA 	invalid,i	;
+		STA 	-6,s	 	; Empiler addresse des caracteres accentues
+		LDA 	motConv,i	;
+		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
+		LDA 	motClea,i	;
+		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
+		SUBSP 	10,i	 	;	
+		CALL	DelInv	 	;
+		DECO	2,s
+		DECO	4,s
+		ADDSP	10,i	 	;
+
+		
 
 	Palin:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
 		
 		LDA	0,i	 	; A = 0
-		LDA	motConv,i	; 
+		LDA	motClea,i	; 
 		STA 	-4,s	 	; Empiler l'adresse de la chaine
 		LDA 	nblet,d 	;
 		STA 	-2,s	 	; Empiler la taille de la chaine
@@ -166,7 +183,7 @@
 ;	npal:	CHARO	'N',i		
 ;
 ;
-;	prefin:	BR	debut		; Retourner au début
+;	prefin:	BR	debut		; Retourner au debut
 
 	f1n:	STRO	msgFI,d
 
@@ -485,20 +502,20 @@ ASCII:.BYTE 0
       .BYTE 30
       .BYTE 31
       .BYTE 32;32
-      .BYTE 32;33
-      .BYTE 32;34
+      .BYTE 33;33
+      .BYTE 34;34
       .BYTE 35
       .BYTE 36
       .BYTE 37
       .BYTE 38
-      .BYTE 32;39
+      .BYTE 39;39
       .BYTE 40
       .BYTE 41
       .BYTE 42
       .BYTE 43
-      .BYTE 32;44
+      .BYTE 44;44
       .BYTE 45
-      .BYTE 32;46
+      .BYTE 46;46
       .BYTE 47
       .BYTE 48
       .BYTE 49
@@ -510,12 +527,12 @@ ASCII:.BYTE 0
       .BYTE 55
       .BYTE 56
       .BYTE 57
-      .BYTE 32;58
-      .BYTE 32;59
+      .BYTE 58;58
+      .BYTE 59;59
       .BYTE 60
       .BYTE 61
       .BYTE 62
-      .BYTE 32;63
+      .BYTE 63;63
       .BYTE 64
       .BYTE 97     ; A
       .BYTE 98     ; B
