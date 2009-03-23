@@ -1,4 +1,38 @@
-;Presentation du Logiciel ( A faire )
+; ********************************************************************************
+; * I N F 2 1 7 0 (TP2 partie 2)
+; *
+; * Ce programme détermine si une Chaine de caractère est un palindrome ou non.
+; * Il demande à l'utilisateur de donner une chaine et par la suite d'afficher 
+; * un message indiquant si la phrase est un palindrome ou non.
+; * 
+; * L'utilisateur peut répéter l'exercice le nombre de fois désiré et ensuite 
+; * en entrant 0 à la place d'une chaine, il termine le programme.
+; *
+; * Les sous programmes suivants sont utilisés pour effectuer l'identification:
+; * 
+; *	LirChain: Lire la chaine entrée par l'utilisateur.
+; *		  Sous-programme fourni sur moodle par Philippe Gabrini.
+; *		
+; *	MinusAcc: Enlever les accents et mettre en minuscules.
+; *		  Philippe Gabrini   novembre 2005.
+; *		
+; *
+; *	VerPal;	  Verifie si la chaine saisie, une fois modifiée par 
+; *		  MinusAcc et DelInv est bien un palindrome.
+; *	
+; *	
+; * Groupe 16 >>
+; * Martin Valiquette (VALM13037400)
+; * martin_valiquette@videotron.ca
+; * 
+; * Olivier Viera   (VIEP12058605)
+; * viera.olivier@videotron.ca
+; *
+; * 	Notez qu'Evens Aurelus a abandonné le cours.
+; * 
+; * @version 23/03/09
+; *
+; ********************************************************************************
 
 	T_MAX:.EQUATE 128; Taille maximum de la chaine saisie (155 + 1)/2
 	
@@ -64,24 +98,34 @@
 
 	Affich:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
 
+		LDA	0,i
 		LDA	palin,d
-		SUBA	1,i
-		DECO	palin,d
-		ASLA			; x2
-		ASLA			; x4
-		STA	palin,d		; x4
-		ASLA			; x8
-		ADDA	palin,d		; +x12
-		ASLA	
-		STA 	palin,d		; +x24
-		ADDA 	msgPal,i	; +x28
+		ASLA			; *2
+		ASLA			; *4
+		STA	palin,d		; palin = palin*4
+		ASLA			; *8
+		ADDA	palin,d		; palin = palin*4 + palin*8
+		ASLA			; *16
+		ADDA	palin,d		; palin = palin*4 + palin*8 + palin*16 
+		STA 	palin,d		; palin = palin*28
+		ADDA 	msgNPa,i	; palin + address element 1
 
 		STA	palin,d		; 
-		CHARO	' ',i
-		STRO	mot,d
+		CHARO	' ',i		;
+
+		CHARO	34,i		;'"'		
+		LDX 	0,i		;
+	bou1:	NOP0			; Afficher es lettres de "mot"
+		CPX	nblet,d		; for ( int x = 0; x < nblet ){
+		BRGE	finBou1		; break finBou1
+		CHARO	mot,x		;
+		ADDX	1,i		; x++
+		BR 	bou1		;
+	
+	finBou1:CHARO	34,i		;'"'	
 		STRO 	palin,n	
 
-	prefin:	BR	debut	
+		BR	debut	
 	
 
 ;--------- TESTS ---	---------
@@ -137,19 +181,20 @@
 	nblet:	.WORD 	0	; Taille de chaine d'origine
 	nbletN:	.WORD	0	; Taille de la chaine apres traitement
 	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
+	temp:	.WORD	0
 
 	
-	msgInv:	.ASCII 	"\nDonnez une chaine:        \x00"
+	msgInv:	.ASCII 	"\n Donnez une chaine: \x00"
 	msgNPa:	.ASCII 	" n'est pas un palindrome. \n\x00"
 	msgPal:	.ASCII 	" est un palindrome.       \n\x00"
 
-	msgSai:	.ASCII 	"Veuillez entrer une chaine: \x00"
-	msgAS:	.ASCII	"Chaine aprÃ¨s saisie: \x00"
-	msgAA:	.ASCII	"Chaine sans accent: \x00"
-	msgAE:	.ASCII	"Chaine sans espaces/ponc.: \x00"
-	msgAL:	.ASCII	"Longueur de la chaine finale: \x00"
-	msgAP:	.ASCII	"Est-ce un palindrome? \x00"
-	msgFI:	.ASCII	"ArrÃªt du programme. \x00"
+;	msgSai:	.ASCII 	"Veuillez entrer une chaine: \x00"
+;	msgAS:	.ASCII	"Chaine apres saisie: \x00"
+;	msgAA:	.ASCII	"Chaine sans accent: \x00"
+;	msgAE:	.ASCII	"Chaine sans espaces/ponc.: \x00"
+;	msgAL:	.ASCII	"Longueur de la chaine finale: \x00"
+;	msgAP:	.ASCII	"Est-ce un palindrome? \x00"
+	msgFI:	.ASCII	"Arret du programme. \x00"
 	
 	invalid:.BYTE	32	;\s
 		.BYTE	33	;'!'
