@@ -1,23 +1,23 @@
 ; ********************************************************************************
 ; * I N F 2 1 7 0 (TP2 partie 2)
 ; *
-; * Ce programme détermine si une Chaine de caractère est un palindrome ou non.
-; * Il demande à l'utilisateur de donner une chaine et par la suite d'afficher 
+; * Ce programme dtermine si une Chaine de caractre est un palindrome ou non.
+; * Il demande  l'utilisateur de donner une chaine et par la suite d'afficher 
 ; * un message indiquant si la phrase est un palindrome ou non.
 ; * 
-; * L'utilisateur peut répéter l'exercice le nombre de fois désiré et ensuite 
-; * en entrant 0 à la place d'une chaine, il termine le programme.
+; * L'utilisateur peut rpter l'exercice le nombre de fois dsir et ensuite 
+; * en entrant 0  la place d'une chaine, il termine le programme.
 ; *
-; * Les sous programmes suivants sont utilisés pour effectuer l'identification:
+; * Les sous programmes suivants sont utiliss pour effectuer l'identification:
 ; * 
-; *	LirChain: Lire la chaine entrée par l'utilisateur.
+; *	LirChain: Lire la chaine entre par l'utilisateur.
 ; *		  Sous-programme fourni sur moodle par Philippe Gabrini.
 ; *		
 ; *	MinusAcc: Enlever les accents et mettre en minuscules.
 ; *		  Philippe Gabrini   novembre 2005.
 ; *		
 ; *
-; *	VerPal;	  Verifie si la chaine saisie, une fois modifiée par 
+; *	VerPal;	  Verifie si la chaine saisie, une fois modifie par 
 ; *		  MinusAcc et DelInv est bien un palindrome.
 ; *	
 ; *	
@@ -28,7 +28,7 @@
 ; * Olivier Viera   (VIEP12058605)
 ; * viera.olivier@videotron.ca
 ; *
-; * 	Notez qu'Evens Aurelus a abandonné le cours.
+; * 	Notez qu'Evens Aurelus a abandonn le cours.
 ; * 
 ; * @version 23/03/09
 ; *
@@ -37,10 +37,11 @@
 	T_MAX:.EQUATE 128; Taille maximum de la chaine saisie (155 + 1)/2
 	
 	debut:	NOP0	; Appel du s. prog. de LECTURE CHAINE:
-			
 		STRO 	msgInv,d	; Message d'invite
-		STA 	mot,d	 	;	
-		LDA 	mot,i	 	;
+		LDA	0,i
+		LDX	0,i
+		;DECO 	mot,i	 	;
+		LDA	mot,i
 		STA 	-4,s	 	; Empiler l'adresse de mot
 		LDA 	T_MAX,i	 	;
 		STA 	-2,s	 	; Empiler T_MAX
@@ -57,15 +58,15 @@
 		LDX 	0,i		; x = 0
 
 ;		==========================================================
-		CODE POUR AFFICHER CORRECTEMENT EN MOE BATCH:;ERROR: Invalid Mnemonic.
-		----------------------------------------------------------;ERROR: Symbol, instruction, or dot command expected.
+;		CODE POUR AFFICHER CORRECTEMENT EN MOE BATCH:
+;		----------------------------------------------------------
 	bou:	NOP0			; Afficher es lettres de "mot"
 		CPX	nblet,d		; for ( int x = 0; x < nblet ){
 		BRGE	MinAcc		; break finBou1
 		CHARO	mot,x		;
 		ADDX	1,i		; x++
 		BR 	bou		;
-		==========================================================;ERROR: Invalid syntax.
+;		==========================================================
 
 	MinAcc:	NOP0	; Appel du s. prog. qui met en MINUSCULES SANS ACCENTS:
 		CHARO	'\n',i	
@@ -94,9 +95,7 @@
 		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
 		SUBSP 	10,i	 	;	
 		CALL	DelInv	 	;
-		DECO	2,s
-		DECO	4,s
-		ADDSP	10,i	 	;
+;		ADDSP	10,i	 	;
 
 		
 
@@ -105,7 +104,7 @@
 		LDA	0,i	 	; A = 0
 		LDA	motClea,i	; 
 		STA 	-4,s	 	; Empiler l'adresse de la chaine
-		LDA 	nblet,d 	;
+		LDA 	nbletN,d 	;
 		STA 	-2,s	 	; Empiler la taille de la chaine
 		SUBSP 	4,i	 	;
 		CALL	VerPal	 	; Appeler le sous-programme : "Vrifier Palindromes"
@@ -322,8 +321,8 @@
 	Inval:	.EQUATE	18	; Adresse du debut du tab. de caracteres invalides
 	ChainA:	.EQUATE	20	; Adresse de la chaine a traiter
 	ChainB:	.EQUATE	22	; Adresse ou retourner la chaine apres traitement
-
-	DelInv:	SUBSP	12,i	
+	AdRetN:	.EQUATE 24	; Nouvelle adresse de retour
+	DelInv:	SUBSP	14,i	
 		STA	VieuxA,d
 		STX	VieuxX,d
 		LDA	8,i
@@ -350,26 +349,25 @@
 
 	fin2:	LDA	Carac,s		; Le char n'est PAS Invalide
 		LDX	0,i
-	bouc3:	CPX	Temp,s		; boucle pour bouger de 1 octet vers la gauche
-		BRGE	fin3		; if (x < 8)
-		ADDX	1,i
-		ASLA
-		BR 	bouc3
+
 	fin3:	NOP0
 		LDX	TaillB,sf	; Taille chaine += 1
 		ADDX	1,i			
 		STX	TaillB,sf
 
 		LDX	IndexI,s	; On l'ajoute donc a chainB
-		STA	ChainB,sxf
+		STBYTEA	ChainB,sxf
 		ADDX	1,i
 		STX	IndexI,s
 		BR	while1
 
 	fin1:	NOP0
+		LDA	AddRet,s
+		STA	AdRetN,s
 		LDX	VieuxX,s
-		LDA	VieuxA,s		
-		ADDSP 	12,i
+		LDA	VieuxA,s
+		
+		ADDSP 	8,i
 		RET0
 
 
