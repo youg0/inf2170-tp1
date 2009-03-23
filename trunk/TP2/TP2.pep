@@ -40,7 +40,7 @@
 		STRO 	msgInv,d	; Message d'invite
 		LDA	0,i
 		LDX	0,i
-		;DECO 	mot,i	 	;
+		DECO 	mot,i	 	;
 		LDA	mot,i
 		STA 	-4,s	 	; Empiler l'adresse de mot
 		LDA 	T_MAX,i	 	;
@@ -96,6 +96,9 @@
 		SUBSP 	10,i	 	;	
 		CALL	DelInv	 	;
 ;		ADDSP	10,i	 	;
+		CHARO 	'\n',i
+		CHARO	motClea,d
+		CHARO 	'\n',i
 
 		
 
@@ -321,8 +324,10 @@
 	Inval:	.EQUATE	18	; Adresse du debut du tab. de caracteres invalides
 	ChainA:	.EQUATE	20	; Adresse de la chaine a traiter
 	ChainB:	.EQUATE	22	; Adresse ou retourner la chaine apres traitement
-	AdRetN:	.EQUATE 24	; Nouvelle adresse de retour
-	DelInv:	SUBSP	14,i	
+
+	AdNRet:	.EQUATE	24	; Nouvelle addr retour
+
+	DelInv:	SUBSP	12,i	
 		STA	VieuxA,d
 		STX	VieuxX,d
 		LDA	8,i
@@ -363,11 +368,12 @@
 
 	fin1:	NOP0
 		LDA	AddRet,s
-		STA	AdRetN,s
+		STA	AdNRet,s
+
 		LDX	VieuxX,s
 		LDA	VieuxA,s
-		
-		ADDSP 	8,i
+
+		ADDSP 	22,i
 		RET0
 
 
