@@ -40,7 +40,7 @@
 		STRO 	msgInv,d	; Message d'invite
 		LDA	0,i
 		LDX	0,i
-		DECO 	mot,i	 	;
+		;DECO 	mot,i	 	;
 		LDA	mot,i
 		STA 	-4,s	 	; Empiler l'adresse de mot
 		LDA 	T_MAX,i	 	;
@@ -84,18 +84,17 @@
 	EnlEsp:	NOP0	; Appel du s. prog. qui ENLEVE LES ESPACES:	
 
 		LDA 	nblet,d	 	;
-		STA 	-10,s	 	; Empiler taille
+		STA 	-12,s	 	; Empiler taille
 		LDA	nbletN,i 	;
-		STA	-8,S	 	; 
+		STA	-10,S	 	; 
 		LDA 	invalid,i	;
-		STA 	-6,s	 	; Empiler addresse des caracteres accentues
+		STA 	-8,s	 	; Empiler addresse des caracteres accentues
 		LDA 	motConv,i	;
-		STA 	-4,s	 	; Empiler addresse de debut de chainer a traiter
+		STA 	-6,s	 	; Empiler addresse de debut de chainer a traiter
 		LDA 	motClea,i	;
-		STA 	-2,s	 	; Empiler addresse ou retourner chaine traitee
-		SUBSP 	10,i	 	;	
+		STA 	-4,s	 	; Empiler addresse ou retourner chaine traitee
+		SUBSP 	12,i	 	;	
 		CALL	DelInv	 	;
-;		ADDSP	10,i	 	;
 		CHARO 	'\n',i
 		CHARO	motClea,d
 		CHARO 	'\n',i
@@ -113,8 +112,7 @@
 		CALL	VerPal	 	; Appeler le sous-programme : "Vrifier Palindromes"
 		LDA	0,s	 	;
 		STA	palin,d	 	;
-		ADDSP	2,s	 	;
-
+		
 	Affich:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
 
 		LDA	0,i
@@ -367,13 +365,14 @@
 		BR	while1
 
 	fin1:	NOP0
+
 		LDA	AddRet,s
 		STA	AdNRet,s
 
 		LDX	VieuxX,s
 		LDA	VieuxA,s
 
-		ADDSP 	22,i
+		ADDSP 	24,i
 		RET0
 
 
