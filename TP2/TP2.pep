@@ -95,10 +95,6 @@
 		STA 	-4,s	 	; Empiler addresse ou retourner chaine traitee
 		SUBSP 	12,i	 	;	
 		CALL	DelInv	 	;
-		CHARO 	'\n',i
-		CHARO	motClea,d
-		CHARO 	'\n',i
-
 		
 
 	Palin:	NOP0	; Appel du s. prog. qui VERIFIE LES PALINDROMES:	
@@ -142,86 +138,12 @@
 	finBou1:CHARO	34,i		;'"'	
 		STRO 	palin,n	
 
-		BR	debut	
+		BR	debut
+
+	f1n:	STRO	msgFI,d	
 	
-
-;--------- TESTS ---	---------
-;	sortie:	NOP0
-;		CHARO	'\n',i
-;		STRO	msgAS,d	
-;		LDX 	0,i
-;	bou1:	CPX 	nblet,d		
-;		BRGE	finBou1
-;		CHARO	mot,x
-;		ADDX	1,i
-;		BR 	bou1
-;	finBou1:CHARO	'\n',i
-;		STRO	msgAA,d
-;		LDX 	0,i
-;	bou2:	CPX 	nblet,d		
-;		BRGE	finBou2
-;;		CHARO	motConv,x
-;		ADDX	1,i
-;		BR 	bou2
-;	finBou2:CHARO	'\n',i
-;		STRO	msgAE,d		
-;		LDX 	0,i
-;	bou3:	CPX 	nbletN,d		
-;		BRGE 	finBou3
-;		CHARO 	motClea,x
-;		ADDX 	1,i
-;		BR 	bou3
-;	finBou3:CHARO 	'\n',i
-;		STRO	msgAL,d
-;		DECO	nbletN,d
-;		CHARO	'\n',i
-;		STRO	msgAP,d
-;		LDA	palin,d
-;;		BREQ	npal
-;	pali:	CHARO	'O',i
-;		BR	prefin
-;	npal:	CHARO	'N',i		
-;
-;
-;	prefin:	BR	debut		; Retourner au debut
-
-	f1n:	STRO	msgFI,d
-
-
-;--------- FIN TESTS ------------
-
 		STOP
 	
-	mot:	.BLOCK 	255	; Chaine d'origine
-	motConv:.BLOCK 	255	; Chaine apres enlever les accents
-	motClea:.BLOCK 	255	; Chaine apres enlever les espaces et ponctuation
-	nblet:	.WORD 	0	; Taille de chaine d'origine
-	nbletN:	.WORD	0	; Taille de la chaine apres traitement
-	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
-	temp:	.WORD	0
-
-	
-	msgInv:	.ASCII 	"\n Donnez une chaine: \x00"
-	msgNPa:	.ASCII 	" n'est pas un palindrome. \n\x00"
-	msgPal:	.ASCII 	" est un palindrome.       \n\x00"
-
-;	msgSai:	.ASCII 	"Veuillez entrer une chaine: \x00"
-;	msgAS:	.ASCII	"Chaine apres saisie: \x00"
-;	msgAA:	.ASCII	"Chaine sans accent: \x00"
-;	msgAE:	.ASCII	"Chaine sans espaces/ponc.: \x00"
-;	msgAL:	.ASCII	"Longueur de la chaine finale: \x00"
-;	msgAP:	.ASCII	"Est-ce un palindrome? \x00"
-	msgFI:	.ASCII	"Arret du programme. \x00"
-	
-	invalid:.BYTE	32	;\s
-		.BYTE	33	;'!'
-		.BYTE	34	;'"'
-		.BYTE	39	;'''
-		.BYTE	44	;','
-		.BYTE	46	;'.'
-		.BYTE	58	;':'
-		.BYTE	59	;';'
-		.BYTE	63	;'?'
 
 ;------- Vrifier palindromes
 ; Lit une chaine de caracteres ASCII et compare l'galit entre le cractre n et 
@@ -297,7 +219,7 @@
 
 	         RET0               ;}// VerPal
 
-	
+;------- Enlever carracteres invalides	
 ; Sous-programme qui enleve les espaces et signes de ponctuation d'une chaine 
 ; entree en parametre. Il retournera la chaine a une adresse qui aura ete
 ; entree en parametre aussi.
@@ -376,7 +298,8 @@
 		RET0
 
 
-	; sous-programme MinusAcc
+	;---------sous-programme MinusAcc
+
 	; transforme une chaine passee en parametre en minuscules sans accents
 	; ou en minuscules avec accents; les lettres minuscules et chiffres
 	; normaux ne sont pas modifies seuls les caracteres majuscules sont
@@ -431,7 +354,6 @@
 	;
 
 	car:     .EQUATE 0
-	
 	regX:    .EQUATE 2
 	regA:    .EQUATE 4
 	retour:  .EQUATE 6
@@ -468,7 +390,28 @@
 	         RET0               ;}// LireChaine
 
 
+	mot:	.BLOCK 	255	; Chaine d'origine
+	motConv:.BLOCK 	255	; Chaine apres enlever les accents
+	motClea:.BLOCK 	255	; Chaine apres enlever les espaces et ponctuation
+	nblet:	.WORD 	0	; Taille de chaine d'origine
+	nbletN:	.WORD	0	; Taille de la chaine apres traitement
+	palin:	.WORD	0	; Palindrome? 1:TRUE 0:FALSE
 
+	
+	msgInv:	.ASCII 	"\n Donnez une chaine: \x00"
+	msgNPa:	.ASCII 	" n'est pas un palindrome. \n\x00"
+	msgPal:	.ASCII 	" est un palindrome.       \n\x00"
+	msgFI:	.ASCII	"Arret du programme. \x00"
+	
+	invalid:.BYTE	32	;\s
+		.BYTE	33	;'!'
+		.BYTE	34	;'"'
+		.BYTE	39	;'''
+		.BYTE	44	;','
+		.BYTE	46	;'.'
+		.BYTE	58	;':'
+		.BYTE	59	;';'
+		.BYTE	63	;'?'
 
 ; table de conversion des codes ASCII en lettres minuscules non accentuees
 
@@ -504,21 +447,21 @@ ASCII:.BYTE 0
       .BYTE 29
       .BYTE 30
       .BYTE 31
-      .BYTE 32;32
-      .BYTE 33;33
-      .BYTE 34;34
+      .BYTE 32
+      .BYTE 33
+      .BYTE 34
       .BYTE 35
       .BYTE 36
       .BYTE 37
       .BYTE 38
-      .BYTE 39;39
+      .BYTE 39
       .BYTE 40
       .BYTE 41
       .BYTE 42
       .BYTE 43
-      .BYTE 44;44
+      .BYTE 44
       .BYTE 45
-      .BYTE 46;46
+      .BYTE 46
       .BYTE 47
       .BYTE 48
       .BYTE 49
@@ -530,12 +473,12 @@ ASCII:.BYTE 0
       .BYTE 55
       .BYTE 56
       .BYTE 57
-      .BYTE 58;58
-      .BYTE 59;59
+      .BYTE 58
+      .BYTE 59
       .BYTE 60
       .BYTE 61
       .BYTE 62
-      .BYTE 63;63
+      .BYTE 63
       .BYTE 64
       .BYTE 97     ; A
       .BYTE 98     ; B
