@@ -10,6 +10,7 @@ using namespace std;
 
 int main() {
 	char * mot;
+	char motc;
 	int fsize, i;
 	PtrNoeud premier = new NoeudArbre;
 	if (!verifierFichier((char *)FILENAME, fsize)) {
@@ -19,18 +20,21 @@ int main() {
 	}
 	if (fsize > LONGUEURTAMPON)
 		cout << "Le fichier contient plus de caracteres que le maximum (" << LONGUEURTAMPON << ")" << endl;
-
-
 	ProchainMot(mot);
-	premier->mot = mot;
-	premier->compte = 1;
-	premier->droite = NULL;
-	premier->gauche = NULL;
+	do {
+		premier->mot = mot;
+		premier->compte = 1;
+		premier->droite = NULL;
+		premier->gauche = NULL;
+		motc = mot[0];
+	} 
+	while (motc == 0 && ProchainMot(mot) != -1);
 
-	while((i = ProchainMot(mot)) != 1) 
-		Inserer(mot, premier);
-	cout << i << endl;
-
+	while((i = ProchainMot(mot)) != 1) {
+		motc = mot[0];
+		if ((int)motc != 0)
+			Inserer(mot, premier);
+	}
 	Afficher(premier);
 
 	return 0;
@@ -48,7 +52,6 @@ bool verifierFichier(char * fichier, int &size) {
 	
 	while (fEntree.tellg() < size && !found)  {
 		carac = fEntree.get();
-		cout << carac << endl;
 		bool valide = (carac >= 'A' && carac <= 'Z')||
 			(carac >= 'a' && carac <= 'z')||carac =='-'||
 			(carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
@@ -120,17 +123,18 @@ void Inserer(char * Mot, PtrNoeud & Arbre) // insérer un élément dans l'arbre
 int ProchainMot(char * &Mot)
 { 
         int fdf;
+	bool nonEspace = false;
         Mot = &Tampon[IndexTamp];
         bool valide;
         unsigned char carac;
         do
         {
-                carac = fEntree.get();
+		carac = fEntree.get();
+		
                 if(!fEntree.eof()){
                         fdf = 0;
                         valide = (carac >= 'A' && carac <= 'Z')||
-                                (carac >= 'a' && carac <= 'z')||carac =='-'||
-                                (carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
+                                (carac >= 'a' && carac <= 'z')||carac =='-';
                         if(valide){
                                 Tampon[IndexTamp] = carac;
                                 IndexTamp++;
@@ -145,7 +149,7 @@ int ProchainMot(char * &Mot)
                 }
         } 
         while(valide && fdf == 0);
-        
+
         return fdf;
 }
 
