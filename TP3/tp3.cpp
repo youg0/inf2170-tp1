@@ -6,10 +6,20 @@
 
 using namespace std;
 
+
+
 int main() {
 	char * mot;
+	int fsize, i;
 	PtrNoeud premier = new NoeudArbre;
-	fEntree.open(FILENAME, ios::in);
+	if (!verifierFichier((char *)FILENAME, fsize)) {
+		cout << "Fichier invalide" << endl;
+		fEntree.close();
+		return 0;
+	}
+	if (fsize > LONGUEURTAMPON)
+		cout << "Le fichier contient plus de caracteres que le maximum (" << LONGUEURTAMPON << ")" << endl;
+
 
 	ProchainMot(mot);
 	premier->mot = mot;
@@ -17,15 +27,40 @@ int main() {
 	premier->droite = NULL;
 	premier->gauche = NULL;
 
-	while(ProchainMot(mot) != 1) 
+	while((i = ProchainMot(mot)) != 1) 
 		Inserer(mot, premier);
-
+	cout << i << endl;
 
 	Afficher(premier);
 
 	return 0;
 }
 
+// Cette methode verifie que le fichier existe, qu'il contienne des caractere valide et qu'il a un taille > 0
+bool verifierFichier(char * fichier, int &size) {
+	bool found = false;
+	unsigned char carac;
+	
+	fEntree.open(fichier, ios::in);
+	fEntree.seekg(0, ios_base::end);
+	size = fEntree.tellg();
+	fEntree.seekg(0, ios_base::beg);
+	
+	while (fEntree.tellg() < size && !found)  {
+		carac = fEntree.get();
+		cout << carac << endl;
+		bool valide = (carac >= 'A' && carac <= 'Z')||
+			(carac >= 'a' && carac <= 'z')||carac =='-'||
+			(carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
+		if (valide) { 
+			found = true;
+			fEntree.seekg(0, ios_base::beg);
+		}
+	}
+	return found;
+		
+
+}
 int Comparaison(char *Mot1, char *Mot2) // Comparer deux mots du tampon global.
 {
 	int i = 0;
@@ -84,35 +119,36 @@ void Inserer(char * Mot, PtrNoeud & Arbre) // insérer un élément dans l'arbre
 
 int ProchainMot(char * &Mot)
 { 
-	int fdf;
-	Mot = &Tampon[IndexTamp];
-	bool valide;
-	unsigned char carac;
-	do
-	{
-		carac = fEntree.get();
-		if(!fEntree.eof()){
-			fdf = 0;
-			valide = (carac >= 'A' && carac <= 'Z')||
-				(carac >= 'a' && carac <= 'z')||carac =='-'||
-				(carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
-			if(valide){
-				Tampon[IndexTamp] = carac;
-				IndexTamp++;
-			}else{
-				Tampon[IndexTamp] = 0;
-				IndexTamp++;
-			}
-		}else{
-			Tampon[IndexTamp] = 0;
-			IndexTamp++;
-			fdf = 1;
-		}
-	} 
-	while(valide && fdf == 0);
-	
-	return fdf;
+        int fdf;
+        Mot = &Tampon[IndexTamp];
+        bool valide;
+        unsigned char carac;
+        do
+        {
+                carac = fEntree.get();
+                if(!fEntree.eof()){
+                        fdf = 0;
+                        valide = (carac >= 'A' && carac <= 'Z')||
+                                (carac >= 'a' && carac <= 'z')||carac =='-'||
+                                (carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
+                        if(valide){
+                                Tampon[IndexTamp] = carac;
+                                IndexTamp++;
+                        }else{
+                                Tampon[IndexTamp] = 0;
+                                IndexTamp++;
+                        }
+                }else{
+                        Tampon[IndexTamp] = 0;
+                        IndexTamp++;
+                        fdf = 1;
+                }
+        } 
+        while(valide && fdf == 0);
+        
+        return fdf;
 }
+
 
 
 void Afficher(PtrNoeud Arbre) // traversée infixe

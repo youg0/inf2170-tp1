@@ -19,4 +19,5 @@ void Inserer(char * Mot, PtrNoeud & Arbre);
 bool Chercher(char * Mot, PtrNoeud Arbre);
 int Comparaison(char *Mot1, char *Mot2);
 void Afficher(PtrNoeud Arbre);
+bool verifierFichier(char * fichier, int &size);
 
