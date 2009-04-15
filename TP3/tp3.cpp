@@ -54,7 +54,7 @@ bool verifierFichier(char * fichier, int &size) {
 		carac = fEntree.get();
 		bool valide = (carac >= 'A' && carac <= 'Z')||
 			(carac >= 'a' && carac <= 'z')||carac =='-'||
-			(carac >= 192 && carac <= 255); // négatifs 'À' à 'ÿ'
+			(carac >= '0' && carac <= '9');
 		if (valide) { 
 			found = true;
 			fEntree.seekg(0, ios_base::beg);
@@ -134,7 +134,9 @@ int ProchainMot(char * &Mot)
                 if(!fEntree.eof()){
                         fdf = 0;
                         valide = (carac >= 'A' && carac <= 'Z')||
-                                (carac >= 'a' && carac <= 'z')||carac =='-';
+                                (carac >= 'a' && carac <= 'z')||carac =='-'||
+				(carac >= '0' && carac <= '9');
+		
                         if(valide){
                                 Tampon[IndexTamp] = carac;
                                 IndexTamp++;
