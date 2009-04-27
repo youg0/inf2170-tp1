@@ -55,7 +55,7 @@ bool verifierFichier(char * fichier, int &size) {
 		bool valide = (carac >= 'A' && carac <= 'Z')||
 			(carac >= 'a' && carac <= 'z')||carac =='-'||
 			(carac >= '0' && carac <= '9');
-		if (valide) { 
+		if (valide) { // Il y a minimum UN caractere valide 
 			found = true;
 			fEntree.seekg(0, ios_base::beg);
 		}
