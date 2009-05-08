@@ -36,7 +36,7 @@
    	 CALL  	LirChain
    	 LDA  	0,s
    	 STA  	nblet,d
-   	 ADDSP  	2,i
+;   	 ADDSP  2,i
 
  metEnM: NOP0
 	 LDA 	ASCII,i
@@ -49,10 +49,10 @@
 	 ;STA 	-2,s
 	 SUBSP   4,i
 	 CALL    lecMot
+	 SUBSP	 2,i
 	 LDA	 0,s
 	 STA	 debMot,d
 	 ADDSP   2,i
-	 
 	 LDX	 debMot,i
 	 LDX	 0,i	 
 ;encore:	 CHARO	 debMot,n
@@ -74,16 +74,13 @@ compTxt: NOP0
    	 STA 	comp,d
    	 DECO 	comp,d
    
+premierN:NOP0
+	 SUBP	8,i;ERROR: Invalid Mnemonic.
+	 LDA	0,i
+	 STA 	PREMIER,s;ERROR: Symbol referenced but not defined.
+	 CALL new
+
    	 STOP
-
-;premierN:NOP0
-;	 SUBP	8,i
-;	 LDA	0,i
-;	 STA 	PREMIER,s
-	 
-	 
-	 
-;	 CALL new
 	 
 
 
@@ -92,13 +89,13 @@ compTxt: NOP0
 
 
 
-; Le sous-programme new alloue la taille demandée et place l'adresse
-; de la zone dans le pointeur dont l'adresse est passée en paramètre.
+; Le sous-programme new alloue la taille demande et place l'adresse
+; de la zone dans le pointeur dont l'adresse est passe en paramtre.
 
 NvieuxX: .EQUATE 0     		; sauvegarde X
 NvieuxA: .EQUATE 2     		; sauvegarde A
 NadRet:  .EQUATE 4      	; adresse retour
-Npoint:  .EQUATE 6      	; adresse pointeur à remplir
+Npoint:  .EQUATE 6      	; adresse pointeur  remplir
 Ntaille: .EQUATE 8     		; taille requise
 ;                            	; void new(int taille, int *&pointeur) {
 
@@ -106,18 +103,18 @@ new:     SUBSP    4,i        	; espace local
          STA      NvieuxA,s 	; sauvegarder A
          STX      NvieuxX,s 	; sauvegarder X
          LDA      heappnt,d 	;
-         STA      Npoint,sf 	; adresse retournée
+         STA      Npoint,sf 	; adresse retourne
          LDA      Ntaille,s 	; taille du noeud
-         ADDA     1,i        	; arrondir à pair
+         ADDA     1,i        	; arrondir  pair
          ANDA     0xFFFE,i   	;
          ADDA     heappnt,d 	; nouvelle valeur
          CPA      heaplmt,i 	;
-         BRGT     new0       	; si pas dépassé la limite du heap
-         STA      heappnt,d 	; mettre à jour heappnt
+         BRGT     new0       	; si pas dpass la limite du heap
+         STA      heappnt,d 	; mettre  jour heappnt
          BR       new1       	; et terminer
 new0:    LDA      0,i        	; sinon
-         STA      Npoint,sf 	; mettre pointeur à NULL
-new1:    LDA      NadRet,s   	; déplacer adresse retour
+         STA      Npoint,sf 	; mettre pointeur  NULL
+new1:    LDA      NadRet,s   	; dplacer adresse retour
          STA      Ntaille,s 	;
 	 LDA   NvieuxA,s 	; restaurer A
 	 LDX   NvieuxX,s 	; restaurer X
@@ -166,7 +163,7 @@ new1:    LDA      NadRet,s   	; déplacer adresse retour
           ;// AJOUT AU SOUS-PROGRAME ORIGINAL 
           ;// POUR TRAITER LES CHAINES TROP LONGUES 
           ;---------------------------------------------------- 
- VideBuff:CHARI   car,s      ; Continuer à lire les caractères exc
+ VideBuff:CHARI   car,s      ; Continuer  lire les caractres exc
           LDBYTEA car,s      
           CPA     0x000A,i   
           BRNE    VideBuff  
@@ -184,22 +181,25 @@ new1:    LDA      NadRet,s   	; déplacer adresse retour
  ;
 
  lecInd:  .EQUATE 0
- lecCode: .EQUATE 2
- lecRegX: .EQUATE 4
- lecRegA: .EQUATE 6
+ lecCode: .EQUATE 2	; 
+ lecTemp: .EQUATE 4
 
- lecARet: .EQUATE 8
+ lecRegX: .EQUATE 6	; Registre X
+ lecRegA: .EQUATE 8	; Registre A
 
- lecConv: .EQUATE 10
- lecVOri: .EQUATE 12
+ lecARet: .EQUATE 10
+
+ lecConv: .EQUATE 12
+ lecVOri: .EQUATE 14
  ;lecTamp: .EQUATE 12
  ;lecPtTam:.EQUATE 14
  ;lecAdCh: .EQUATE 16
- lecVRet: .EQUATE 14
- lecNARet:.EQUATE 12      ; taille maximum
+ lecVRet: .EQUATE 16
+
+ lecNARet:.EQUATE 16      ; taille maximum
                              ;{
 
-lecMot:   SUBSP   8,i        ;  espace local
+lecMot:   SUBSP   10,i        ;  espace local
           STA     lecRegA,s  ;  sauvegarde A
           STX     lecRegX,s  ;  sauvegarde X
           LDX     0,i        ;  indice = 1
@@ -228,12 +228,18 @@ lecMot:   SUBSP   8,i        ;  espace local
 	  LDX  	  lecCode,s 
 	  LDBYTEA lecConv,sxf
 	  CPA	  0x0000,i		; 
-	  BREQ	  lecFin		; 
+	  BREQ	  lecFin		;
 	  LDX	  lecInd,s
  ecrit:	  NOP0
    	  STBYTEA ptrMot,n 
 	  CHARO	  ptrMot,n
-
+;	  DECO	  ptrMot,d
+	  STA	  lecTemp,s
+	  LDA	  ptrMot,d
+	  ADDA	  1,i
+	  STA	  ptrMot,d
+	  LDA     lecTemp,s
+  
  prochain:ADDX    1,i
    	  STX     lecInd,s
    	  BR      lecBou
@@ -241,7 +247,6 @@ lecMot:   SUBSP   8,i        ;  espace local
 	  ADDX    1,i
 	  LDA	  48,i
 	  STBYTEA ptrMot,n
-	  CHARO	  ptrMot,n	  
 	  
  	  LDA     lecARet,s 
    	  STA     lecNARet,s
@@ -327,10 +332,10 @@ lecMot:   SUBSP   8,i        ;  espace local
 
  	texte2:  .BLOCK  255
 
-	heappnt: .ADDRSS heap ; initialement pointe à heap
-	heap:    .BLOCK 255  ; espace heap; dépend du systéme
-       		 .BLOCK 255  ; espace heap; dépend du systéme
-		 .BLOCK 255  ; espace heap; dépend du systéme
+	heappnt: .ADDRSS heap ; initialement pointe  heap
+	heap:    .BLOCK 255  ; espace heap; dpend du systme
+       		 .BLOCK 255  ; espace heap; dpend du systme
+		 .BLOCK 255  ; espace heap; dpend du systme
 
 heaplmt:.BYTE    0   ;
 
@@ -526,69 +531,69 @@ ASCII:.BYTE 0
       .BYTE 0
       .BYTE 0
       .BYTE 0
-      .BYTE 224     ; à
+      .BYTE 224     ; 
       .BYTE 225     ; a+,
-      .BYTE 226     ; â
+      .BYTE 226     ; 
       .BYTE 227     ; a+~
-      .BYTE 228     ; ä
-      .BYTE 229     ; a+°
+      .BYTE 228     ; 
+      .BYTE 229     ; a+
       .BYTE 230     ; ae
-      .BYTE 231     ; ç
-      .BYTE 232     ; è
-      .BYTE 233     ; é
-      .BYTE 234     ; ê
-      .BYTE 235     ; ë
-      .BYTE 236     ; ì
+      .BYTE 231     ; 
+      .BYTE 232     ; 
+      .BYTE 233     ; 
+      .BYTE 234     ; 
+      .BYTE 235     ; 
+      .BYTE 236     ; 
       .BYTE 237     ; i+,
-      .BYTE 238     ; î
-      .BYTE 239     ; ï
+      .BYTE 238     ; 
+      .BYTE 239     ; 
       .BYTE 0       ; 
       .BYTE 241     ; n+~
-      .BYTE 242     ; ò
+      .BYTE 242     ; 
       .BYTE 243     ; o+,
-      .BYTE 244     ; ô
+      .BYTE 244     ; 
       .BYTE 245     ; o+~
-      .BYTE 246     ; ö
+      .BYTE 246     ; 
       .BYTE 0       ;
       .BYTE 248     ; o+/
-      .BYTE 249     ; ù
+      .BYTE 249     ; 
       .BYTE 250     ; u+,
-      .BYTE 251     ; û
-      .BYTE 252     ; ü
+      .BYTE 251     ; 
+      .BYTE 252     ; 
       .BYTE 0       ; 
       .BYTE 0	    ;
-      .BYTE 255	    ; ÿ
-      .BYTE 224     ; à
+      .BYTE 255	    ; 
+      .BYTE 224     ; 
       .BYTE 225     ; a+,
-      .BYTE 226     ; â
+      .BYTE 226     ; 
       .BYTE 227     ; a+~
-      .BYTE 228     ; ä
-      .BYTE 229     ; a+°
+      .BYTE 228     ; 
+      .BYTE 229     ; a+
       .BYTE 230     ; ae
-      .BYTE 231     ; ç
-      .BYTE 232     ; è
-      .BYTE 233     ; é
-      .BYTE 234     ; ê
-      .BYTE 235     ; ë
-      .BYTE 236     ; ì
+      .BYTE 231     ; 
+      .BYTE 232     ; 
+      .BYTE 233     ; 
+      .BYTE 234     ; 
+      .BYTE 235     ; 
+      .BYTE 236     ; 
       .BYTE 237     ; i+,
-      .BYTE 238     ; î
-      .BYTE 239     ; ï
+      .BYTE 238     ; 
+      .BYTE 239     ; 
       .BYTE 0       ; 
       .BYTE 241     ; n+~
-      .BYTE 242     ; ò
+      .BYTE 242     ; 
       .BYTE 243     ; o+,
-      .BYTE 244     ; ô
+      .BYTE 244     ; 
       .BYTE 245     ; o+~
-      .BYTE 246     ; ö
+      .BYTE 246     ; 
       .BYTE 0       ;
       .BYTE 248     ; o+/
-      .BYTE 249     ; ù
+      .BYTE 249     ; 
       .BYTE 250     ; u+,
-      .BYTE 251     ; û
-      .BYTE 252     ; ü
+      .BYTE 251     ; 
+      .BYTE 252     ; 
       .BYTE 0       ; 
       .BYTE 0	    ;
-      .BYTE 255	    ; ÿ
+      .BYTE 255	    ; 
 
 	.END
