@@ -53,11 +53,11 @@
 	 STA	 debMot,d
 	 ADDSP   2,i
 	 
-	 STRO	debMot,d
+	 LDX	 debMot,i
 	 LDX	 0,i	 
-encore:	 LDBYTEA debMot,n
-	 ADDX	 1,i
-	 BRNE 	 encore
+;encore:	 CHARO	 debMot,n
+;	 ADDX	 1,i
+;	 BRNE 	 encore
 
 	
 
@@ -227,15 +227,21 @@ lecMot:   SUBSP   8,i        ;  espace local
 	  STA	  lecCode,s
 	  LDX  	  lecCode,s 
 	  LDBYTEA lecConv,sxf
-	  CPA	  0x0000,i		; if ( minVOri == '-'){
+	  CPA	  0x0000,i		; 
 	  BREQ	  lecFin		; 
 	  LDX	  lecInd,s
  ecrit:	  NOP0
    	  STBYTEA ptrMot,n 
+	  CHARO	  ptrMot,n
+
  prochain:ADDX    1,i
    	  STX     lecInd,s
    	  BR      lecBou
  lecFin:  NOP0
+	  ADDX    1,i
+	  LDA	  48,i
+	  STBYTEA ptrMot,n
+	  CHARO	  ptrMot,n	  
 	  
  	  LDA     lecARet,s 
    	  STA     lecNARet,s
