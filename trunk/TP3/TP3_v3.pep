@@ -43,21 +43,31 @@
 	 STA 	-4,s
 	 LDA 	texte,i
 	 STA 	-2,s
-	 ;LDA 	ptrMot,i
-	 ;STA 	-4,s
-	 ;LDA 	0,i
-	 ;STA 	-2,s
 	 SUBSP   4,i
 	 CALL    lecMot
-	 SUBSP	 2,i
 	 LDA	 0,s
+	 SUBSP	 2,i
 	 STA	 debMot,d
 	 ADDSP   2,i
 	 LDX	 debMot,i
-	 LDX	 0,i	 
-;encore:	 CHARO	 debMot,n
-;	 ADDX	 1,i
-;	 BRNE 	 encore
+	 LDX	 0,i	
+
+	 LDA 	ASCII,i
+	 STA 	-4,s
+	 LDA 	texte2,i
+	 STA 	-2,s
+	 SUBSP   4,i
+	 CALL    lecMot
+	 LDA	 0,s
+	 SUBSP	 2,i
+	 STA	 debMot,d
+	 ADDSP   2,i
+	 LDX	 debMot,i
+	 LDX	 0,i	
+ 
+encore: DECO	 debMot,d
+	 ;ADDX	 1,i
+	 ;BRNE 	 encore
 
 	
 
@@ -75,12 +85,13 @@ compTxt: NOP0
    	 DECO 	comp,d
    
 premierN:NOP0
-	 SUBP	8,i;ERROR: Invalid Mnemonic.
-	 LDA	0,i
-	 STA 	PREMIER,s;ERROR: Symbol referenced but not defined.
-	 CALL new
+;	 SUBSP	8,i
+;	 LDA	0,i
+;	 STA 	
+;	 PREMIER,s
+;	 CALL new
 
-   	 STOP
+ ;  	 STOP
 	 
 
 
@@ -191,12 +202,9 @@ new1:    LDA      NadRet,s   	; dplacer adresse retour
 
  lecConv: .EQUATE 12
  lecVOri: .EQUATE 14
- ;lecTamp: .EQUATE 12
- ;lecPtTam:.EQUATE 14
- ;lecAdCh: .EQUATE 16
  lecVRet: .EQUATE 16
 
- lecNARet:.EQUATE 16      ; taille maximum
+ ;lecNARet:.EQUATE 18      ; taille maximum
                              ;{
 
 lecMot:   SUBSP   10,i        ;  espace local
@@ -207,7 +215,8 @@ lecMot:   SUBSP   10,i        ;  espace local
                              ;  while(true){
 
 	  LDA	  ptrMot,d
-	  STA	  lecVRet,sf
+	  STA	  lecVRet,s
+	  DECO	  lecVRet,s
 	  ;LDX	  texte,d
 	  ;LDX    texte,d	  
  	  ;STA	  lecAdCh,s
@@ -249,10 +258,10 @@ lecMot:   SUBSP   10,i        ;  espace local
 	  STBYTEA ptrMot,n
 	  
  	  LDA     lecARet,s 
-   	  STA     lecNARet,s
+   	  STA     lecVOri,s
    	  LDA  	  lecRegA,s
    	  LDX     lecRegX,s
-   	  ADDSP   lecNARet,i
+   	  ADDSP   14,i
    	  RET0
      
  ;------- comparer
