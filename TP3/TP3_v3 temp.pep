@@ -24,6 +24,8 @@
    	 CALL  	LirChain
    	 LDA  	0,s
    	 STA  	nblet,d
+	 DECO	nblet,d
+	 CHARO	' ',i
    	 ADDSP  2,i
   
  Lecture:NOP0
@@ -42,6 +44,13 @@
 	 LDA	 2,s
 	 STA	 indText,d
 	 ADDSP	 4,i
+	CHARO	 ' ',i
+	DECO	 debMot,d
+	CHARO	 ' ',i
+	DECO	 ptrMot,d
+	CHARO	 ' ',i
+	DECO	 indText,d
+	CHARO	 ' ',i
 
 	 LDA 	 ASCII,i
 	 STA 	 -12,s
@@ -57,7 +66,15 @@
 	 STA	 debMot,d
 	 LDA	 2,s
 	 STA	 indText,d
-	 ADDSP	 4,i
+	 ADDSP	 4,i	
+	CHARO	 ' ',i
+	DECO	 debMot,d
+	CHARO	 ' ',i
+	DECO	 ptrMot,d
+	CHARO	 ' ',i
+	DECO	 indText,d
+	CHARO	 ' ',i
+
 
 	 LDA 	 ASCII,i
 	 STA 	 -12,s
@@ -76,8 +93,11 @@
 	 ADDSP	 4,i
 
  
-encore: DECO	 debMot,d
+encore: CHARO	 ' ',i
+	DECO	 debMot,d
+	CHARO	 ' ',i
 	DECO	 ptrMot,d
+	CHARO	 ' ',i
 	DECO	 indText,d
 	 ;ADDX	 1,i
 	 ;BRNE 	 encore
