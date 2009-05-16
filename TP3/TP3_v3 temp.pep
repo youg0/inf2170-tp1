@@ -23,9 +23,7 @@
    	 SUBSP  4,i
    	 CALL  	LirChain
    	 LDA  	0,s
-   	 STA  	nblet,d
-	 DECO	nblet,d
-	 CHARO	' ',i
+   	 STA  	nblet,d 	; Nombre de lettre de la chaîne
    	 ADDSP  2,i
   
  Lecture:NOP0
@@ -45,13 +43,13 @@
 	 LDA	 2,s
 	 STA	 indText,d
 	 ADDSP	 4,i
-	 CHARO	 ' ',i
-	 DECO	 debMot,d
-	 CHARO	 ' ',i
-	 DECO	 ptrMot,d
-	 CHARO	 ' ',i
-	 DECO	 indText,d
-	 CHARO	 ' ',i
+;	 CHARO	 ' ',i
+;	 DECO	 debMot,d	; adresse debut mot
+;	 CHARO	 ' ',i
+;	 DECO	 ptrMot,d	; adresse fin mot
+;	 CHARO	 ' ',i
+;	 DECO	 indText,d	; indice pour textebl
+;	 CHARO	 ' ',i
 	 
   	 LDA 	 ptrMot,d
 	 SUBA	 1,i
