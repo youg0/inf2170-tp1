@@ -29,52 +29,6 @@
    	 ADDSP  2,i
   
  Lecture:NOP0
-	 LDA 	 ASCII,i
-	 STA 	 -12,s
-	 LDA 	 texte,i
-	 STA 	 -10,s
-	 LDA	 ptrMot,i
-	 STA     -8,s
-	 LDA	 indText,d
-	 STA	 -6,s
-	 SUBSP   12,i
-	 CALL    lecMot
-	 LDA	 0,s
-	 STA	 debMot,d
-	 LDA	 2,s
-	 STA	 indText,d
-	 ADDSP	 4,i
-	CHARO	 ' ',i
-	DECO	 debMot,d
-	CHARO	 ' ',i
-	DECO	 ptrMot,d
-	CHARO	 ' ',i
-	DECO	 indText,d
-	CHARO	 ' ',i
-
-	 LDA 	 ASCII,i
-	 STA 	 -12,s
-	 LDA 	 texte,i
-	 STA 	 -10,s
-	 LDA	 ptrMot,i
-	 STA     -8,s
-	 LDA	 indText,d
-	 STA	 -6,s
-	 SUBSP   12,i
-	 CALL    lecMot
-	 LDA	 0,s
-	 STA	 debMot,d
-	 LDA	 2,s
-	 STA	 indText,d
-	 ADDSP	 4,i	
-	CHARO	 ' ',i
-	DECO	 debMot,d
-	CHARO	 ' ',i
-	DECO	 ptrMot,d
-	CHARO	 ' ',i
-	DECO	 indText,d
-	CHARO	 ' ',i
-
 
 	 LDA 	 ASCII,i
 	 STA 	 -12,s
@@ -91,7 +45,24 @@
 	 LDA	 2,s
 	 STA	 indText,d
 	 ADDSP	 4,i
+	 CHARO	 ' ',i
+	 DECO	 debMot,d
+	 CHARO	 ' ',i
+	 DECO	 ptrMot,d
+	 CHARO	 ' ',i
+	 DECO	 indText,d
+	 CHARO	 ' ',i
+	 
+  	 LDA 	 ptrMot,d
+	 SUBA	 1,i
+	 STA	 temp1,d
+	 LDA	 0,i
+	 LDBYTEA temp1,n	
+	 CPA	 0x0A,i	 
+	 BREQ	 fin
+ 	 BR	 Lecture
 
+	
  
 encore: CHARO	 ' ',i
 	DECO	 debMot,d
@@ -121,7 +92,7 @@ compTxt: NOP0
 ;	 PREMIER,s
 ;	 CALL new
 
-	 STOP
+fin:	 STOP
 	 
 
 
@@ -210,7 +181,9 @@ new1:    LDA      NadRet,s   	; dplacer adresse retour
           BRNE    VideBuff  
           LDX     -1,i      ;Signaler l'erreur au reste du progra
           ;---------------------------------------------------- 
- FiniL:   STX     taille,s   ;  nombre de caracteres lus
+ FiniL:   LDA	  0x0A,i
+	  STBYTEA addrBuf,sxf
+	  STX     taille,s   ;  nombre de caracteres lus
           LDA     retour,s   ;  adresse retour
           STA     addrBuf,s  ;  deplacee
           LDA     regA,s     ;  restaure A
@@ -265,7 +238,7 @@ lecMot:   SUBSP   8,i        ;  espace local
  lecBou:  LDX  	  lecInd,s 
  	  LDBYTEA lecVOri,sxf
    	  CPA  	  0x0A,i	; if ( minVOri == fin de fichier){
-   	  BREQ    lecFin	; 
+   	  BREQ    lecFCha	; 
 	  STA	  lecCode,s
 	  LDX  	  lecCode,s 
 	  LDBYTEA lecConv,sxf
@@ -285,11 +258,20 @@ lecMot:   SUBSP   8,i        ;  espace local
 	  ADDX    1,i
    	  STX     lecInd,s
    	  BR      lecBou
+ lecFCha: NOP0
+	  LDA 	  0x0A,i	
+	  STBYTEA ptrMot,n
+	  BR	  vraiFin
+	  
  lecFin:  NOP0
 	  LDX     lecTemp,s
 	  LDA	  48,i
 	  STBYTEA ptrMot,n 
 	  CHARO   ptrMot,n 
+
+vraiFin:  LDA	  ptrMot,d
+	  ADDA	  1,i
+   	  STA	  ptrMot,d
 
 	  LDX	  lecInd,s
 	  STX	  lecVRet2,s
@@ -366,6 +348,7 @@ lecMot:   SUBSP   8,i        ;  espace local
   
  	comp:    .WORD  0
  	nblet:   .WORD  0
+	temp1:	 .WORD  0
  	msgInv:  .ASCII  "Entrez un texte. \x00"
  	texte:	 .ADDRSS texteBl
 	texteBl: .BLOCK  255
