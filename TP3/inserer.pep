@@ -25,7 +25,7 @@
 		LDA	InsMot,s
 		STA	-2,s
 		SUBSP	4,i
-		CALL	new;ERROR: Symbol referenced but not defined.
+		CALL	new
 		LDA	InsMot,s	; Le noeud est situé à InsTemp
 		STA	InsTemp,sf
 		BR	InsFin
@@ -34,7 +34,7 @@
 		STA	-4,s
 		LDA	InsRac,sf
 		STA	-2,s
-		CALL	Compare		; On compare le mot à la racine;ERROR: Symbol referenced but not defined.
+		CALL	Compare		; On compare le mot à la racine
 		LDA	0,s
 		ADDSP	2,i
 		BREQ	InsInc
