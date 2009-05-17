@@ -1,67 +1,72 @@
-;------- Inserer
+;--------- Inserer
 
- InsInd:  .EQUATE 0
- InsRegX: .EQUATE 2  ; Registre X
- InsRegA: .EQUATE 4  ; Registre A
- InsRet:  .EQUATE 6  ;
- Insptnd: .EQUATE 8  ; pointeur noeud
- Insptmot:.EQUATE 10 ; pointeur mot
- Instemp: .EQUATE 12 ;
+	InsRegA:	.EQUATE 0
+	InsRegX:	.EQUATE 2
+	InsTemp:	.EQUATE	4
+	
+	InsARet:	.EQUATE 6
+	
+	InsMot:		.EQUATE	8	; Mot à insérer
+	InsRac:		.EQUATE	10	; Racine de l'arbre
 
 
-Inserer:	SUBSP	6,i
-        	STA     InsRegA,s  ;  sauvegarde A
-        	STX     InsRegX,s  ;  sauvegarde X
-        	LDX     0,i        ;  indice = 0
-        	LDA     Insptnd,s  ;  
-  		CPA 0x0000,i   ; 
-  		BREQ novnoed    ;
-		Compa:  STA   -4,s       ;
-     		LDA   Insptmot,s ;
-        	STA   -2,s       ;
-       		SUBSP   4,i        ;
-        	CALL    compare    ;
-    		ADDSP   2,i        ;
-  		LDA 0,i        ;
-  		LDA     0,s        ;
-  		CPA 0,i        ;
-  		BREQ incre      ;
-  		BRGT droit
-  		BRLT gauche
-droit:  	LDX 6,i
-  		BR noeud
-gauche:  	LDX 4,i
-noeud:  	LDA  Insptnd,sxf
-  		STA -4,s
-  		LDA Insptmot,s
-  		STA -2,s
-  		SUBSP  4,i
-  		CALL Inserer
+	Inser:	SUBSP	6,I
+		STA	InsRegA,s
+		STX	InsRegX,s
+		LDA	0,i
+		LDX	0,i
 
-novnoed:	LDA Instemp,s
-  		STA -4,s
-  		LDA     8,i
-  		STA  -2,s
-  		SUBSP   4,i
-  		CALL new  
- 
+		LDA	InsRac,s	; On verifie si la racine est null
+		BRNE	InsCmp
 
-  		LDA  Insptmot,s
-  		STA Instemp,sf
-  		LDX 2,i
-  		LDA 1,i
-    		STA  Instemp,sxf
-  		BR final
+	InsCrN:	NOP0			; On cree un nouveau noeud
+		LDA	InsTemp,s
+		STA	-4,s
+		LDA	InsMot,s
+		STA	-2,s
+		SUBSP	4,i
+		CALL	new;ERROR: Symbol referenced but not defined.
+		LDA	InsMot,s	; Le noeud est situé à InsTemp
+		STA	InsTemp,sf
+		BR	InsFin
 
-incre:  	LDX 2,i
-  		LDA Insptnd,sxf
-  		ADDA 1,i
-  		STA Insptnd,sxf
-  		BR final
+	InsCmp:	LDA	InsMot,s
+		STA	-4,s
+		LDA	InsRac,sf
+		STA	-2,s
+		CALL	Compare		; On compare le mot à la racine;ERROR: Symbol referenced but not defined.
+		LDA	0,s
+		ADDSP	2,i
+		BREQ	InsInc
+		BRGT	InsGT
+		BRLT	InsLT
 
-final:  	NOP0
-  		LDA     InsRegA,s     ;  restaure A
-        	LDX     InsRegX,s     ;  restaure X
-        	ADDSP   8,i        ;  nettoyer pile
-        	RET0               ;}// LireChaine
+	InsInc:	LDX	2,i		; On incrémente le nb d'occurences
+		LDA	InsRac,sxf
+		ADDA	1,i
+		STA	InsRac,sxf
+		BR	InsFin
 
+	InsLT:	LDA	InsMot,s	; Si le mot est plus petit, on vérifie avec le mot
+		STA	-4,s		; à la gauche de la racine
+		LDX	4,i
+		LDA	InsRac,sxf
+		STA	-2,s
+		SUBSP	4,i
+		CALL	Inser
+		ADDSP	2,i
+		BR	InsFin
+	
+	InsGT:	LDA	InsMot,s	; Si le mot est plus grand, on vérifie avec le mot
+		STA	-4,s		; à la droite de la racine
+		LDX	6,i
+		LDA	InsRac,sxf
+		STA	-2,s
+		SUBSP	4,i
+		CALL	Inser
+		ADDSP	2,i
+				
+	InsFin:	LDA	InsRegA,s
+		LDX	InsRegX,s
+		ADDSP	8,i
+		RET0	
