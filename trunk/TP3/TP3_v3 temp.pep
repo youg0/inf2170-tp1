@@ -45,7 +45,10 @@
   LDA  2,s
   STA  indText,d
   ADDSP  4,i
- 
+  CHARO	' ',i
+  DECO	debMot,d 
+  CHARO	' ',i
+
   LDA  racine,d
   BRNE  debIns
   LDA racine,i
@@ -54,9 +57,13 @@
   STA -2,s
   SUBSP 4,i
   CALL  new
+  DECO racine,d
+  CHARO ' ',i
   LDA debMot,d
   STA racine,n
-  DECO racine,d
+  DECO racine,i
+  CHARO ' ',i
+ ; DECO heappnt,d
   BR finIns
   
 
@@ -147,13 +154,16 @@ fin:  STOP
  InsCrN: NOP0   ; On cree un nouveau noeud
   LDA InsTemp,s
   STA -6,s
-  LDA InsMot,s
+  LDA 8,i
   STA -4,s
   SUBSP 6,i
   CALL new
   ADDSP 2,i
   LDA InsMot,s ; Le noeud est situé à InsTemp
-  STA InsTemp,sf
+  DECO InsTemp,s
+  CHARO ' ',i
+  DECO InsTemp,sf
+  STA  InsTemp,sf
   BR InsFin
 
  InsCmp: LDA InsMot,s
