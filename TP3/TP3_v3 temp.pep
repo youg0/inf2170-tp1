@@ -82,7 +82,6 @@ debIns:  NOP0
    STA -2,s
    SUBSP 4,i
    CALL Inser
-   ;SUBSP 8,i
   
 finIns:  LDA   ptrMot,d
   SUBA  1,i
@@ -138,8 +137,9 @@ fin:  STOP
  
  InsARet: .EQUATE 6
  
- InsMot:  .EQUATE 8 ; Mot à insérer
+ InsMot:  .EQUATE 8 ; Mot �  insérer
  InsRac:  .EQUATE 10 ; Racine de l'arbre
+ InsNARet:.EQUATE 10 ; Racine de l'arbre
 
 
  Inser: SUBSP 6,I
@@ -159,7 +159,7 @@ fin:  STOP
   SUBSP 6,i
   CALL new
   ADDSP 2,i
-  LDA InsMot,s ; Le noeud est situé à InsTemp
+  LDA InsMot,s ; Le noeud est situé �  InsTemp
   DECO InsTemp,s
   CHARO ' ',i
   DECO InsTemp,sf
@@ -171,7 +171,7 @@ fin:  STOP
   LDA InsRac,sf
   STA -4,s
   SUBSP 6,i
-  CALL compare  ; On compare le mot à la racine
+  CALL compare  ; On compare le mot �  la racine
   LDA 0,s
   ADDSP 2,i
   BREQ InsInc
@@ -185,28 +185,32 @@ fin:  STOP
   BR InsFin
 
  InsLT: LDA InsMot,s ; Si le mot est plus petit, on vérifie avec le mot
-  STA -6,s  ; à la gauche de la racine
+  STA -4,s  ; �  la gauche de la racine
   LDX 4,i
   LDA InsRac,sxf
-  STA -4,s
-  SUBSP 6,i
+  STA -2,s
+  SUBSP 4,i
   CALL Inser
-  ADDSP 2,i
+  ;ADDSP 2,i
   BR InsFin
  
  InsGT: LDA InsMot,s ; Si le mot est plus grand, on vérifie avec le mot
-  STA -4,s  ; à la droite de la racine
+  STA -4,s  ; �  la droite de la racine
   LDX 6,i
   LDA InsRac,sxf
   STA -2,s
   SUBSP 4,i
   CALL Inser
-  ADDSP 2,i
+  ;ADDSP 2,i
     
- InsFin: LDA InsRegA,s
+  
+ InsFin: LDA     InsARet,s 
+  STA	  InsNARet,s 
+  LDA InsRegA,s
   LDX InsRegX,s
-  ADDSP 8,i
+  ADDSP   InsNARet,i
   RET0 
+
 
 
 ; Le sous-programme new alloue la taille demande et place l'adresse
