@@ -37,14 +37,16 @@
   	 CPA  	 0X0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
  	 BREQ    Fin		; break 
    	 
- 	 LDA   	 0,i  		; Insersion du noeud racine avec GAUCHE et DROITE à nul.
-   	 STA     -8,s  	 	;
-   	 LDA   	 debMot,d 	;
-   	 STA   	-6,s 		;
-   	 LDA   	heappnt,d 	;
-  	 STA   	-2,s  		;
-   	 SUBSP  8,i  		;
-   	 CALL   Inserer  	; 
+ 	 LDA   	 racine,i  		; Insersion du noeud racine avec GAUCHE et DROITE à nul.
+ 	STA   	-8,s  		;
+ 	LDA   	debMot,d 	;
+ 	STA  	-6,s  		;
+ 	LDA   	ptrMot,i 	;
+ 	STA   	-4,s  		;
+ 	LDA   	heappnt,d 	;
+ 	STA   	-2,s  		;
+ 	SUBSP   8,i  		;
+ 	CALL   	Inserer  	;
 
 Lecture:NOP0 			; Boucle principale
    	LDA     ASCII,i  	;
@@ -181,9 +183,6 @@ lecBou0: CHARI   lecCode,s  	; cin >> caractere;
 	 BREQ	 lecFinB	;	 
 	 CPA	 0,i		;
 	 BRNE	 lecEcri	; le caractere n'est pas nul: break
-	 LDA  	 ptrMot,d 	;
-	 ADDA  	 1,i  		;
-  	 STA  	 ptrMot,d 	;
 	 BR	 lecBou0	; tant que lecaratere lu est null apres converstion
 	 
 lecBou:  CHARI   lecCode,s   	; 
@@ -220,8 +219,6 @@ lecFinA: NOP0			;
 lecFin:  LDA  	 ptrMot,d 	;
          ADDA  	 1,i  		;
   	 STA  	 ptrMot,d 	;
-	 LDA	 0x0A,i		; 
-	 STBYTEA ptrMot,n 	; 
 
 	 LDA  	 ptrMot,d 	;
   	 STA  	 ptrMot,d 	;
@@ -309,6 +306,11 @@ lecFin:  LDA  	 ptrMot,d 	;
  ; Sous programme recursif qui parcour l'arbre et le cherche dans le but 
  ; d'inserer le mot a la bonne position dans l'arbre
 
+ ; @param 
+ ; @param 
+ ; @param 
+ ; @param 
+
 
  InsInd:  .EQUATE 0
  InsRegX: .EQUATE 2  ; Registre X
@@ -321,84 +323,85 @@ lecFin:  LDA  	 ptrMot,d 	;
  InsNRet: .EQUATE 14 ;
 
 
-Inserer:   SUBSP   6,i
-           STA     InsRegA,s   ;  sauvegarde A
-           STX     InsRegX,s   ;  sauvegarde X
-           LDX     0,i         ;  indice = 0
-           LDA     Insptnd,s   ;  
-        CPA    0x0000,i    ; 
-        BREQ    novnoed     ; 
-Compa:   LDA     Insptnd,sf   ;   
-    STA     -4,s        ;
-          LDA     Insptmot,s  ;
-           STA     -2,s        ;
-           SUBSP   4,i         ;
-           CALL    compare     ;
-        LDA     0,s         ;
-        CPA   0,i         ;
-        BREQ   incre       ;
-        BRLT   droit  ;
-        BRGT   gauche  ;
-droit:     LDX   6,i  ;
-    LDA    Insptnd,sxf ;
-        STA   -8,s  ;
-        LDA   Insptmot,s ;
-        STA   -6,s  ;
-        LDA   Insptfi,s ;
-     STA   -4,s  ;
-        LDA  Inshpptr,s ;
-     STA  -2,s  ;
-     SUBSP  8,i  ;
-        CALL  Inserer  ;
-    LDX  6,i  ;
-    LDA   Insptnd,sxf ;
-    CPA  0x0000,i ;
-    BREQ  Update  ;
-    BR  final  ;
-gauche:   LDX  4,i
-    LDA   Insptnd,sxf ;
-         STA  -8,s  ;
-         LDA  Insptmot,s ;
-         STA  -6,s  ;
-         LDA  Insptfi,s ;
-       STA  -4,s  ;
-         LDA  Inshpptr,s ;
-       STA  -2,s  ;
-       SUBSP  8,i  ;
-         CALL  Inserer  
-    LDX  4,i  ;
-    LDA   Insptnd,sxf ;
-    CPA  0x0000,i ;
-    BREQ  Update  ;
-    BR  final  ;
-novnoed:   LDA  Inshpptr,s ;
-        STA  -4,s  ;
-        LDA     8,i  ;
-        STA   -2,s  ;
-        SUBSP   4,i  ;
-        CALL  new    ;
-       LDA   Insptmot,s ;
-        STA  Inshpptr,sf ;
-        LDX  2,i  ;
-        LDA  1,i  ;
-        STA   Inshpptr,sxf ;
-        BR  final  ;
+ Inserer: SUBSP	6,i
+          STA	InsRegA,s   ;  sauvegarde A
+          STX	InsRegX,s   ;  sauvegarde X
+          LDX	0,i         ;  indice = 0
+          LDA	Insptnd,s   ;  
+	  CPA	0x0000,i    ; 
+          BREQ	nNoeud      ; 
+
+Compa:    LDA	Insptnd,sf  ;   
+    	  STA   -4,s        ;
+          LDA	Insptmot,s  ;
+          STA     -2,s        ;
+          SUBSP   4,i         ;
+          CALL    compare     ;
+          LDA     0,s         ;
+          CPA     0,i         ;
+          BREQ    incre       ;
+          BRLT    Droit  ;
+          BRGT    Gauche  ;
+Droit:    LDX     6,i  ;
+    	  LDA     Insptnd,sxf ;
+          STA     -8,s  ;
+          LDA     Insptmot,s ;
+          STA     -6,s  ;
+          LDA     Insptfi,s ;
+          STA     -4,s  ;
+          LDA     Inshpptr,s ;
+          STA     -2,s  ;
+          SUBSP   8,i  ;
+          CALL    Inserer  ;
+          LDX     6,i  ;
+          LDA     Insptnd,sxf ;
+          CPA     0x0000,i ;
+    	  BREQ    Update  ;
+    	  BR      final  ;
+Gauche:   LDX  	  4,i
+          LDA     Insptnd,sxf ;
+          STA  	  -8,s  ;
+          LDA  	  Insptmot,s ;
+          STA  	  -6,s  ;
+          LDA  	   Insptfi,s ;
+          STA  -4,s  ;
+          LDA  Inshpptr,s ;
+          STA  -2,s  ;
+          SUBSP  8,i  ;
+          CALL  Inserer  
+          LDX  4,i  ;
+          LDA   Insptnd,sxf ;
+          CPA  0x0000,i ;
+          BREQ  Update  ;
+          BR  final  ;
+nNoeud:   LDA  Inshpptr,s ;
+          STA  -4,s  ;
+          LDA     8,i  ;
+          STA   -2,s  ;
+          SUBSP   4,i  ; 
+          CALL  new    ;
+          LDA   Insptmot,s ;
+          STA  Inshpptr,sf ;
+          LDX  2,i  ;
+          LDA  1,i  ;
+          STA   Inshpptr,sxf ;
+          BR  final  ;
 incre:    LDX  2,i  ;
-        LDA  Insptnd,sxf ;
-        ADDA  1,i  ;
-        STA  Insptnd,sxf ;
-    LDA Insptmot,s ;
-    STA Insptfi,sf ;
-        BR  final  ;
+          LDA  Insptnd,sxf ;
+          ADDA  1,i  ;
+          STA  Insptnd,sxf ;
+          LDA Insptmot,s ;
+          STA Insptfi,sf ;
+          BR  final  ;
 Update:   LDA  Inshpptr,s ;
-     STA  Insptnd,sxf ;
+          STA  Insptnd,sxf ;
 final:    NOP0
-     LDA  InsRet,s ;
-     STA InsNRet,s ;
-         LDA     InsRegA,s      ;  restaure A
-           LDX     InsRegX,s      ;  restaure X
-           ADDSP   InsNRet,i       ;  nettoyer pile
-           RET0                ;}// LireChaine
+          LDA  InsRet,s ;
+          STA 	  InsNRet,s ;
+          LDA     InsRegA,s      ;  restaure A
+          LDX     InsRegX,s      ;  restaure X
+          ADDSP   InsNRet,i       ;  nettoyer pile
+          RET0                ;}// LireChaine
 
 
  ;------- Affiche
