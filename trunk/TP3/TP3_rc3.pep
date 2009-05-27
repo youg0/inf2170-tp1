@@ -306,7 +306,7 @@ lecFin:  LDA  	 ptrMot,d 	;
  ; Sous programme recursif qui parcour l'arbre et le cherche dans le but 
  ; d'inserer le mot a la bonne position dans l'arbre
 
- ; @param 
+ ; @param debut
  ; @param 
  ; @param 
  ; @param 
