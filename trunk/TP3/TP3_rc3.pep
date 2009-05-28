@@ -1,10 +1,11 @@
 
 
+
+ ;ADMOT:  .EQUATE 0
+ NB_OCC: .EQUATE 2
+ GAUCHE: .EQUATE 4
+ DROITE: .EQUATE 6
  TAILLE: .EQUATE 8
- GAUCHE: .EQUATE 0
- DROITE: .EQUATE 2
- ADMOT:  .EQUATE 4
- OCC:    .EQUATE 6
 
  T_MAX:  .EQUATE 20000
   
@@ -26,7 +27,7 @@
  	 CALL    lecMot  	;
  	 LDA     0,s  		;
  	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
-	 SUBSP   2,i		;
+	 ADDSP   2,i		;
 
    	 LDA     ptrMot,d 	;
      	 SUBA    1,i  		; 
@@ -38,15 +39,15 @@
  	 BREQ    Fin		; break 
    	 
  	 LDA   	 racine,i  		; Insersion du noeud racine avec GAUCHE et DROITE à nul.
- 	STA   	-8,s  		;
- 	LDA   	debMot,d 	;
- 	STA  	-6,s  		;
- 	LDA   	ptrMot,i 	;
- 	STA   	-4,s  		;
- 	LDA   	heappnt,d 	;
- 	STA   	-2,s  		;
- 	SUBSP   8,i  		;
- 	CALL   	Inserer  	;
+ 	 STA   	-8,s  		;
+ 	 LDA   	debMot,d 	;
+ 	 STA  	-6,s  		;
+ 	 LDA   	ptrMot,i 	;
+ 	 STA   	-4,s  		;
+ 	 LDA   	heappnt,d 	;
+ 	 STA   	-2,s  		;
+ 	 SUBSP   8,i  		;
+ 	 CALL   Inserer	;
 
 Lecture:NOP0 			; Boucle principale
    	LDA     ASCII,i  	;
@@ -97,7 +98,9 @@ Affiche:LDA  	racine,d  	;
  	SUBSP  	2,i  		;
  	CALL  	Afficher 	;
 
-Fin:    STOP     		;
+Fin:    CHARO	0x0A,i		; Saut de ligne
+	STRO 	msgFin,d	;
+	STOP     		;
 
 ;---------New ( Noeud )
 
@@ -130,9 +133,9 @@ new0: 	LDA     0,i          	; sinon
 
 new1: 	LDA     NadRet,s     	; dplacer adresse retour
  	STA     Ntaille,s   	;
- 	LDA    NvieuxA,s   	; restaurer A
- 	LDX    NvieuxX,s   	; restaurer X
- 	ADDSP  8,i        	; nettoyer pile
+ 	LDA     NvieuxA,s   	; restaurer A
+ 	LDX     NvieuxX,s   	; restaurer X
+ 	ADDSP   8,i        	; nettoyer pile
  	RET0            	; return; }
    
  
@@ -220,7 +223,7 @@ lecFin:  LDA  	 ptrMot,d 	;
          ADDA  	 1,i  		;
   	 STA  	 ptrMot,d 	;
 
-	 LDA  	 ptrMot,d 	;
+	 LDA     ptrMot,d 	;
   	 STA  	 ptrMot,d 	;
  	 LDA  	 lecARet,s 	;
   	 STA  	 lecNARet,s 	;
@@ -294,6 +297,7 @@ lecFin:  LDA  	 ptrMot,d 	;
 
  memeLong: LDA     0,i  		;
            STA     comVRet,s 		;
+
  finCom:   LDA     comARet,s  		;
            STA     comNARet,s 		;
            LDA     comRegA,s 		;
@@ -305,12 +309,6 @@ lecFin:  LDA  	 ptrMot,d 	;
  ;------- Inserer
  ; Sous programme recursif qui parcour l'arbre et le cherche dans le but 
  ; d'inserer le mot a la bonne position dans l'arbre
-
- ; @param debut
- ; @param 
- ; @param 
- ; @param 
-
 
  InsInd:  .EQUATE 0
  InsRegX: .EQUATE 2  ; Registre X
@@ -324,203 +322,191 @@ lecFin:  LDA  	 ptrMot,d 	;
 
 
  Inserer: SUBSP	6,i
-          STA	InsRegA,s   ;  sauvegarde A
-          STX	InsRegX,s   ;  sauvegarde X
-          LDX	0,i         ;  indice = 0
-          LDA	Insptnd,s   ;  
-	  CPA	0x0000,i    ; 
-          BREQ	nNoeud      ; 
+          STA     InsRegA,s	;  sauvegarde A
+          STX	  InsRegX,s	;  sauvegarde X
+          LDX	  0,i		;  indice = 0
+          LDA	  Insptnd,s	;  
+	  CPA	  0x0000,i	;
+          BREQ	  nNoeud		;
 
-Compa:    LDA	Insptnd,sf  ;   
-    	  STA   -4,s        ;
-          LDA	Insptmot,s  ;
-          STA     -2,s        ;
-          SUBSP   4,i         ;
-          CALL    compare     ;
-          LDA     0,s         ;
-          CPA     0,i         ;
-          BREQ    incre       ;
-          BRLT    Droit  ;
-          BRGT    Gauche  ;
-Droit:    LDX     6,i  ;
-    	  LDA     Insptnd,sxf ;
-          STA     -8,s  ;
-          LDA     Insptmot,s ;
-          STA     -6,s  ;
-          LDA     Insptfi,s ;
-          STA     -4,s  ;
-          LDA     Inshpptr,s ;
-          STA     -2,s  ;
-          SUBSP   8,i  ;
-          CALL    Inserer  ;
-          LDX     6,i  ;
-          LDA     Insptnd,sxf ;
-          CPA     0x0000,i ;
-    	  BREQ    Update  ;
-    	  BR      final  ;
-Gauche:   LDX  	  4,i
-          LDA     Insptnd,sxf ;
-          STA  	  -8,s  ;
-          LDA  	  Insptmot,s ;
-          STA  	  -6,s  ;
-          LDA  	   Insptfi,s ;
-          STA  -4,s  ;
-          LDA  Inshpptr,s ;
-          STA  -2,s  ;
-          SUBSP  8,i  ;
-          CALL  Inserer  
-          LDX  4,i  ;
-          LDA   Insptnd,sxf ;
-          CPA  0x0000,i ;
-          BREQ  Update  ;
-          BR  final  ;
-nNoeud:   LDA  Inshpptr,s ;
-          STA  -4,s  ;
-          LDA     8,i  ;
-          STA   -2,s  ;
-          SUBSP   4,i  ; 
-          CALL  new    ;
-          LDA   Insptmot,s ;
-          STA  Inshpptr,sf ;
-          LDX  2,i  ;
-          LDA  1,i  ;
-          STA   Inshpptr,sxf ;
-          BR  final  ;
-incre:    LDX  2,i  ;
-          LDA  Insptnd,sxf ;
-          ADDA  1,i  ;
-          STA  Insptnd,sxf ;
-          LDA Insptmot,s ;
-          STA Insptfi,sf ;
-          BR  final  ;
-Update:   LDA  Inshpptr,s ;
-          STA  Insptnd,sxf ;
-final:    NOP0
-          LDA  InsRet,s ;
-          STA 	  InsNRet,s ;
-          LDA     InsRegA,s      ;  restaure A
-          LDX     InsRegX,s      ;  restaure X
-          ADDSP   InsNRet,i       ;  nettoyer pile
-          RET0                ;}// LireChaine
+ compa:   LDA	  Insptnd,sf  	;   
+    	  STA     -4,s        	;
+          LDA	  Insptmot,s  	;
+          STA     -2,s      	;
+          SUBSP   4,i       	;
+          CALL    compare   	;
+          LDA     0,s       	;
+          CPA     0,i       	;
+          BREQ    incre     	;
+          BRLT    droit     	;
+          BRGT    gauche    	;
+
+ droit:   LDX     DROITE,i  	;
+    	  LDA     Insptnd,sxf 	;
+          STA     -8,s  	;
+          LDA     Insptmot,s 	;
+          STA     -6,s  	;
+          LDA     Insptfi,s 	;
+          STA     -4,s  	;
+          LDA     Inshpptr,s 	;
+          STA     -2,s  	;
+          SUBSP   8,i  		;
+          CALL    Inserer  	;
+          LDX     6,i  		;
+          LDA     Insptnd,sxf 	;
+          CPA     0x0000,i 	;
+    	  BREQ    update  	;
+    	  BR      final  	;
+
+ gauche:  LDX  	  GAUCHE,i	;
+          LDA     Insptnd,sxf 	;
+          STA  	  -8,s  	;
+          LDA  	  Insptmot,s 	;
+          STA  	  -6,s  	;
+          LDA  	  Insptfi,s 	;
+          STA  	  -4,s 	 	;
+          LDA     Inshpptr,s 	;
+          STA     -2,s  	;
+          SUBSP   8,i  		;
+          CALL    Inserer	;
+          LDX     4,i  		;
+          LDA     Insptnd,sxf 	;
+          CPA     0x0000,i 	;
+          BREQ    update  	;
+          BR      final  	;
+
+ nNoeud:  LDA	  Inshpptr,s 	;
+          STA 	  -4,s  	;
+          LDA     TAILLE,i 	;
+          STA     -2,s 		;
+          SUBSP   4,i  		; 
+          CALL    new    	;
+          LDA     Insptmot,s 	;
+          STA     Inshpptr,sf 	;
+          LDX     2,i  		;
+          LDA     1,i  		;
+          STA     Inshpptr,sxf 	;
+          BR      final  	;
+
+ incre:   LDX     NB_OCC,i  	;
+          LDA     Insptnd,sxf 	;
+          ADDA    1,i  		;
+          STA  	  Insptnd,sxf 	;
+          LDA 	  Insptmot,s 	;
+          STA 	  Insptfi,sf 	;
+          BR  	  final  	;
+
+ update:  LDA  	  Inshpptr,s 	;
+          STA  	  Insptnd,sxf 	;
+
+ final:   LDA  	  InsRet,s 	;
+          STA 	  InsNRet,s 	;
+          LDA     InsRegA,s     ;  restaure A
+          LDX     InsRegX,s     ;  restaure X
+          ADDSP   InsNRet,i     ;  nettoyer pile
+          RET0                  ;
 
 
  ;------- Affiche
  ; Sous programme recursif affichant l'arbre en ordre alphabetique 
  ; ainsi que le nombre d'occurence de chaque mot
 
-AffRegX: .EQUATE 0 
-AffRegA: .EQUATE 2
-AffRet:  .EQUATE 4
-AffArb:  .EQUATE 6
+temp:	 .EQUATE 0
+
+AffRegX: .EQUATE 2 
+AffRegA: .EQUATE 4
+
+AffRet:  .EQUATE 6
+AffArb:  .EQUATE 8
+AffNRet:  .EQUATE 8
 
 
-Afficher:   NOP0   ;
-      SUBSP 4,i  ;
-      STX AffRegX,s  ; 
-      STA AffRegA,s  ;
-      LDA AffArb,s  ;
-      CPA 0x0000,i   ; if (Arbre != NULL)
-      BREQ affFinal  ;
-      LDX 4,i   ;
-      LDA AffArb,sxf  ;
-      STA -2,s  ;
-      SUBSP 2,i  ;
-      CALL  Afficher   ; Afficher(Arbre->gauche)
-    ADDSP 2,i  ;
-      LDX 2,i   ;
-    LDA AffArb,sf  ;
-    STA temp5,d  ;
-      STRO temp5,n   ; cout << Arbre->mot
-         STRO   msgnb,d   ;
-      DECO AffArb,sxf  ; cout << Arbre->compte
-          STRO   enter,d   ;  
-      LDX 6,i   ;
-      LDA AffArb,sxf  ;
-    STA -2,s  ;
-      SUBSP 2,i  ;
-      CALL  Afficher   ; Afficher(Arbre->droite)
-    ADDSP 2,i  ;
-affFinal:   LDA AffRegA,s  ;
-      LDX AffRegX,s  ;
-      ADDSP 4,i    ;
-      RET0   
+Afficher:NOP0   		;
+      	 SUBSP   AffRet,i   	;
+         STX     AffRegX,s  	; 
+      	 STA 	 AffRegA,s  	;
+      	 LDA     AffArb,s  	;
+      	 CPA     0x0000,i   	; if (Arbre != NULL)
+      	 BREQ    affFinal  	;
+      	 LDX     GAUCHE,i   	;
+      	 LDA     AffArb,sxf  	;
+      	 STA 	 -2,s  		;
+      	 SUBSP   2,i  		;
+      	 CALL  	 Afficher   	; Afficher(Arbre->gauche)
+      	 LDX 	 NB_OCC,i   	;
+    	 LDA 	 AffArb,sf  	; 
+    	 STA     temp,s  	;
+      	 STRO 	 temp,sf   	; cout << Arbre->mot
+         STRO    msgUti,d   	;
+      	 DECO 	 AffArb,sxf     ; cout << Arbre->compte
+         STRO    msgFois,d   	;
+         CHARO	 0x0A,i  	; Saut de ligne
+      	 LDX 	 6,i   		;
+         LDA 	 AffArb,sxf  	;
+    	 STA 	 -2,s  		;
+      	 SUBSP   2,i  		;
+      	 CALL  	 Afficher   	; Afficher(Arbre->droite)
+affFinal:LDA 	 AffRet,s  ;
+      	 STA 	 AffNRet,s  ;
+	 LDA 	 AffRegA,s  ;
+      	 LDX 	 AffRegX,s  ;
+      	 ADDSP 	 AffNRet,i    ;
+      	 RET0   
+
+; ------------- variables:
+
+ msgInv:  .ASCII  "Entrez un texte. \x0A\x00"
+ msgFin:  .ASCII  "Arrêt normal du programme. \x0A\x00"
+ msgUti:  .ASCII  " utilisé \x00"
+ msgFois: .ASCII  " fois.\x00"
+ 
+
+tabMot:  .BLOCK  255 
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+    	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
+   	 .BLOCK  255
 
 
-enter:  .ASCII  " \x0A\x00"
-msgInv:   .ASCII  "Entrez un texte. \x0A\x00"
-msgnb:   .ASCII  " est dans le texte \x00"
-texte:   .ADDRSS texteBl
-texteBl:  .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-tabMot:   .BLOCK  255 
-.BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-   .BLOCK  255
-
-
-ptrMot:   .ADDRSS tabMot
-debMot:   .ADDRSS tabMot
-longMot:  .WORD   0
-indText:  .WORD   0
-temp1:  .WORD 0
-texte2:   .BLOCK  255
-racine:   .ADDRSS heap
-heappnt:  .ADDRSS heap ; initialement pointe  heap
-heap:     .BLOCK  255  ; espace heap; dpend du systme
-          .BLOCK  255  ; espace heap; dpend du systme
-       .BLOCK  255  ; espace heap; dpend du systme
-       .BLOCK  255
-      .BLOCK  255
-      .BLOCK  255
-      .BLOCK  255
-      .BLOCK  255
+ptrMot:  .ADDRSS tabMot
+debMot:  .ADDRSS tabMot
+temp1:   .WORD 0
+racine:  .ADDRSS heap
+heappnt: .ADDRSS heap ; initialement pointe  heap
+heap:    .BLOCK  255  ; espace heap; dpend du systme
+         .BLOCK  255 
+       	 .BLOCK  255 
+       	 .BLOCK  255
+      	 .BLOCK  255
+      	 .BLOCK  255
+      	 .BLOCK  255
+         .BLOCK  255
 heaplmt: .BYTE    0   ;
-temp5:   .WORD 0
+
 ASCII:.BYTE 1
       .BYTE 0
       .BYTE 0
