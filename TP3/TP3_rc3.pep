@@ -1,7 +1,7 @@
 
 
 
- ;ADMOT:  .EQUATE 0
+ MOT:    .EQUATE 0
  NB_OCC: .EQUATE 2
  GAUCHE: .EQUATE 4
  DROITE: .EQUATE 6
@@ -20,16 +20,18 @@
          STRO    msgInv,d  	; cout "Entrez chaine:"
 
        	 LDA     ASCII,i  	; Appel de la méthode lecMot pour fabriquer la racine.
- 	 STA     -6,s  		;
+ 	 STA     -8,s  		;
  	 LDA     ptrMot,i 	;
- 	 STA     -4,s  		;
- 	 SUBSP   6,i  		;
+ 	 STA     -6,s  		;
+ 	 SUBSP   8,i  		;
  	 CALL    lecMot  	;
  	 LDA     0,s  		;
- 	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
-	 ADDSP   2,i		;
-
-   	 LDA     ptrMot,d 	;
+ 	 STA     debMot,n 	; Enregistrement de l'adresse du début du mot lu.
+         LDA     2,s 		;
+	 ADDSP   4,i		;
+	 STA     ptrMot,n	;
+	
+	 LDA     ptrMot,n 	;
      	 SUBA    1,i  		; 
        	 STA     temp1,d  	; Enregistrement de la position de ptrMot,d -1
        	 LDA     0,i  		;
@@ -60,7 +62,7 @@ Lecture:NOP0 			; Boucle principale
 	ADDSP	2,i		;
  	STA    	debMot,d 	;
 
- 	LDA     ptrMot,d 	;
+ 	LDA     ptrMot,i 	;
  	SUBA    1,i  		; 
  	STA     temp1,d  	;
  	LDA     0,i  		;
@@ -162,6 +164,7 @@ lecARet: .EQUATE 6   		; Adresse de retour
 lecConv: .EQUATE 8   		; tableau de conversion
 lecPtr:  .EQUATE 10   		; Adresse du tampon de mots
 lecVRet: .EQUATE 12   		; Valeur de retour ( Adresse du mot )
+lecVRet2:.EQUATE 14   		; Adresse du tampon de mots
 lecNARet:.EQUATE 10   		; Nouvelle valeur de retour
 
 lecMot:  SUBSP 	 lecARet,i   	; espace local
@@ -170,7 +173,7 @@ lecMot:  SUBSP 	 lecARet,i   	; espace local
   	 LDX  	 0,i   		; 
   	 LDA  	 0,i   		; 
 
-  	 LDA  	 ptrMot,d 	; 
+  	 LDA  	 lecPtr,s 	; 
   	 STA  	 lecVRet,s 	; Met l'adresse actuelle du tampon dans la valeur deretour.
   	 LDA  	 0,i  		;
 
@@ -197,34 +200,32 @@ lecBou:  CHARI   lecCode,s   	;
   	 LDX  	 lecCode,s  	;
   	 LDBYTEA lecConv,sxf;
 
-lecEcri: STBYTEA ptrMot,n 	;
+lecEcri: STBYTEA lecPtr,sf 	;
 	 BREQ	 lecFin		;
 	 CPA	 1,i		;
 	 BREQ	 lecFinA	;	
-	 LDA  	 ptrMot,d 	;
+	 LDA  	 lecPtr,s 	;
 	 ADDA  	 1,i  		;
-  	 STA  	 ptrMot,d 	;
+  	 STA  	 lecPtr,s 	;
 	 BR   	 lecBou  	; tant que le caratere lu n'est pas nul et n'est pas egal a 0x0A.
 
 lecFinB: LDA	 0x0B,i		;  
-	 STBYTEA ptrMot,n 	;
+	 STBYTEA lecPtr,sf 	;
 	 BR 	 lecFin 	;
 
 lecFinA: NOP0			;
 	 LDA	 0,i		;
-	 STBYTEA ptrMot,n 	;
-	 LDA  	 ptrMot,d 	;
+	 STBYTEA lecPtr,sf  	;
+	 LDA  	 lecPtr,s 	;
 	 ADDA  	 1,i  		;
-  	 STA  	 ptrMot,d 	;
+  	 STA  	 lecPtr,s 	;
 	 LDA	 0x0A,i 	;
-	 STBYTEA ptrMot,n 	;
+	 STBYTEA lecPtr,sf  	;
 
-lecFin:  LDA  	 ptrMot,d 	;
+lecFin:  LDA  	 lecPtr,s 	;
          ADDA  	 1,i  		;
-  	 STA  	 ptrMot,d 	;
+  	 STA  	 lecVRet2,s	;
 
-	 LDA     ptrMot,d 	;
-  	 STA  	 ptrMot,d 	;
  	 LDA  	 lecARet,s 	;
   	 STA  	 lecNARet,s 	;
   	 LDA  	 lecRegA,s 	;
@@ -310,6 +311,16 @@ lecFin:  LDA  	 ptrMot,d 	;
  ; Sous programme recursif qui parcour l'arbre et le cherche dans le but 
  ; d'inserer le mot a la bonne position dans l'arbre
 
+ ;Compisition d'un noeud:
+ 
+ ;MOT:    .EQUATE 0
+ ;NB_OCC: .EQUATE 2
+ ;GAUCHE: .EQUATE 4
+ ;DROITE: .EQUATE 6
+
+ ;TAILLE: .EQUATE 8
+
+
  InsInd:  .EQUATE 0
  InsRegX: .EQUATE 2  ; Registre X
  InsRegA: .EQUATE 4  ; Registre A
@@ -327,9 +338,10 @@ lecFin:  LDA  	 ptrMot,d 	;
           LDX	  0,i		;  indice = 0
           LDA	  Insptnd,s	;  
 	  CPA	  0x0000,i	;
-          BREQ	  nNoeud		;
+          BREQ	  nNoeud	;
 
- compa:   LDA	  Insptnd,sf  	;   
+ compa:   LDX     MOT,i  	; 
+    	  LDA     Insptnd,sxf 	; 
     	  STA     -4,s        	;
           LDA	  Insptmot,s  	;
           STA     -2,s      	;
