@@ -21,17 +21,17 @@
 
        	 LDA     ASCII,i  	; Appel de la méthode lecMot pour fabriquer la racine.
  	 STA     -8,s  		;
- 	 LDA     ptrMot,i 	;
+ 	 LDA     ptrMot,d 	;
  	 STA     -6,s  		;
  	 SUBSP   8,i  		;
  	 CALL    lecMot  	;
  	 LDA     0,s  		;
- 	 STA     debMot,n 	; Enregistrement de l'adresse du début du mot lu.
+ 	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
          LDA     2,s 		;
 	 ADDSP   4,i		;
-	 STA     ptrMot,n	;
+	 STA     ptrMot,d	;
 	
-	 LDA     ptrMot,n 	;
+	 LDA     ptrMot,d 	;
      	 SUBA    1,i  		; 
        	 STA     temp1,d  	; Enregistrement de la position de ptrMot,d -1
        	 LDA     0,i  		;
@@ -40,7 +40,7 @@
   	 CPA  	 0X0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
  	 BREQ    Fin		; break 
    	 
- 	 LDA   	 racine,i  		; Insersion du noeud racine avec GAUCHE et DROITE à nul.
+ 	 LDA   	racine,i  	; Insersion du noeud racine avec GAUCHE et DROITE à nul.
  	 STA   	-8,s  		;
  	 LDA   	debMot,d 	;
  	 STA  	-6,s  		;
@@ -51,22 +51,30 @@
  	 SUBSP   8,i  		;
  	 CALL   Inserer	;
 
-Lecture:NOP0 			; Boucle principale
-   	LDA     ASCII,i  	;
-     	STA     -6,s  		;
-     	LDA    	ptrMot,i 	;
-     	STA     -4,s  		;
-     	SUBSP   6,i  		; 
- 	CALL    lecMot  	; Appel de "Lecture Mot"
- 	LDA    	0,s  		;
-	ADDSP	2,i		;
- 	STA    	debMot,d 	;
+	 LDBYTEA temp1,n  	; Compare "ptrMot,d - 1" et 0X0B 
+  	 CPA  	 0X0A,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
+ 	 BREQ    Affiche	; break 
+	 
 
- 	LDA     ptrMot,i 	;
+Lecture:NOP0 			; Boucle principale
+       	 LDA     ASCII,i  	; Appel de la méthode lecMot pour fabriquer la racine.
+ 	 STA     -8,s  		;
+ 	 LDA     ptrMot,d 	;
+ 	 STA     -6,s  		;
+ 	 SUBSP   8,i  		;
+ 	 CALL    lecMot  	;
+ 	 LDA     0,s  		;
+ 	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
+         LDA     2,s 		;
+	 ADDSP   4,i		;
+	 STA     ptrMot,d	;
+
+ 	LDA     ptrMot,d 	;
  	SUBA    1,i  		; 
  	STA     temp1,d  	;
  	LDA     0,i  		;
  	LDBYTEA temp1,n  	;
+
  	CPA     0x0A,i	   	; 
  	BREQ    Inseref  	; Fin de ligne cas 1: 
  	CPA     0x0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
@@ -82,6 +90,11 @@ Insere: LDA   	racine,d  	;
  	STA   	-2,s  		;
  	SUBSP   8,i  		;
  	CALL   	Inserer  	;
+
+	LDBYTEA temp1,n  	; Compare "ptrMot,d - 1" et 0X0B 
+  	CPA  	 0X0A,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
+ 	BREQ    Affiche	; break 
+
  	BR   	Lecture  	;
 
 Inseref:LDA   	racine,d  	; 
@@ -354,7 +367,11 @@ lecFin:  LDA  	 lecPtr,s 	;
           BRGT    gauche    	;
 
  droit:   LDX     DROITE,i  	;
-    	  LDA     Insptnd,sxf 	;
+	  BR	  recure	;
+
+ gauche:  LDX  	  GAUCHE,i	;
+
+ recure:  LDA     Insptnd,sxf 	;
           STA     -8,s  	;
           LDA     Insptmot,s 	;
           STA     -6,s  	;
@@ -370,22 +387,6 @@ lecFin:  LDA  	 lecPtr,s 	;
     	  BREQ    update  	;
     	  BR      final  	;
 
- gauche:  LDX  	  GAUCHE,i	;
-          LDA     Insptnd,sxf 	;
-          STA  	  -8,s  	;
-          LDA  	  Insptmot,s 	;
-          STA  	  -6,s  	;
-          LDA  	  Insptfi,s 	;
-          STA  	  -4,s 	 	;
-          LDA     Inshpptr,s 	;
-          STA     -2,s  	;
-          SUBSP   8,i  		;
-          CALL    Inserer	;
-          LDX     4,i  		;
-          LDA     Insptnd,sxf 	;
-          CPA     0x0000,i 	;
-          BREQ    update  	;
-          BR      final  	;
 
  nNoeud:  LDA	  Inshpptr,s 	;
           STA 	  -4,s  	;
