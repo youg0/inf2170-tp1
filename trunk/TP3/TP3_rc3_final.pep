@@ -79,7 +79,7 @@ Lecture:NOP0 			; Boucle principale
  	CPA     0x0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
 	BREQ  	Affiche		; Fin de ligne cas 2:
 	LDA     heappnt,d 	;
-	CPA	heaplmt,i		;
+	CPA	heapfin,i		;
 	BRGT	Fintamp
 Insere: LDA   	racine,d  	;
  	STA   	-8,s  		;
@@ -475,6 +475,7 @@ temp1:   .WORD 0
 racine:  .ADDRSS heap
 heappnt: .ADDRSS heap ; initialement pointe  heap
 heap:    .BLOCK  255  ; espace heap; dpend du systme
+heapfin: .BLOCK	 255
 heaplmt: .BYTE    0   ;
 
 ASCII:.BYTE 1
