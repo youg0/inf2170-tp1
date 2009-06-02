@@ -70,13 +70,17 @@ Lecture:NOP0 			; Boucle principale
 	 STA     ptrMot,d	;
 
  	LDA     ptrMot,d 	;
+	CPA	tablmt,i	;
+	BRGT	Fintamp
  	SUBA    1,i  		; 
  	STA     temp1,d  	;
  	LDA     0,i  		;
  	LDBYTEA temp1,n  	;
  	CPA     0x0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
 	BREQ  	Affiche		; Fin de ligne cas 2:
-
+	LDA     heappnt,d 	;
+	CPA	heaplmt,i		;
+	BRGT	Fintamp
 Insere: LDA   	racine,d  	;
  	STA   	-8,s  		;
  	LDA   	debMot,d 	;
@@ -102,7 +106,9 @@ Affiche:LDA  	racine,d  	;
 Fin:    CHARO	0x0A,i		; Saut de ligne
 	STRO 	msgFin,d	;
 	STOP     		;
-
+Fintamp:CHARO	0x0A,i		; Saut de ligne
+	STRO 	msgtamp,d	;
+	STOP     		;
 ;---------New ( Noeud )
 
 ; Le sous-programme new alloue la taille demande et place l'adresse
@@ -455,40 +461,13 @@ affFinal:LDA 	 AffRet,s  ;
 
  msgInv:  .ASCII  "Entrez un texte. \x0A\x00"
  msgFin:  .ASCII  "Arrêt normal du programme. \x0A\x00"
+ msgtamp: .ASCII  "Limite du tampon atteinte. \x0A\x00"
  msgUti:  .ASCII  " utilisé \x00"
  msgFois: .ASCII  " fois.\x00"
  
 
 tabMot:  .BLOCK  255 
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-    	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-   	 .BLOCK  255
-
+tablmt:	 .BYTE 	 0
 
 ptrMot:  .ADDRSS tabMot
 debMot:  .ADDRSS tabMot
@@ -496,13 +475,6 @@ temp1:   .WORD 0
 racine:  .ADDRSS heap
 heappnt: .ADDRSS heap ; initialement pointe  heap
 heap:    .BLOCK  255  ; espace heap; dpend du systme
-         .BLOCK  255 
-       	 .BLOCK  255 
-       	 .BLOCK  255
-      	 .BLOCK  255
-      	 .BLOCK  255
-      	 .BLOCK  255
-         .BLOCK  255
 heaplmt: .BYTE    0   ;
 
 ASCII:.BYTE 1
