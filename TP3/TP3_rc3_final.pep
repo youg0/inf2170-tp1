@@ -25,21 +25,22 @@
  	 STA     -6,s  		;
  	 SUBSP   8,i  		;
  	 CALL    lecMot  	;
- 	 LDA     0,s  		;
+ 	 LDA     0,s  		; Load ladresse du debut du mot
  	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
-         LDA     2,s 		;
+	 CPA	 -1,i
+	 BREQ	 Fintamp
+         LDA     2,s 		; Load ladresse de la fin du mot
+	 STA     ptrMot,d	; Store dans ptrMot
 	 ADDSP   4,i		;
-	 STA     ptrMot,d	;
 	
-	 LDA     ptrMot,d 	;
      	 SUBA    1,i  		; 
        	 STA     temp1,d  	; Enregistrement de la position de ptrMot,d -1
        	 LDA     0,i  		;
 
        	 LDBYTEA temp1,n  	; Compare "ptrMot,d - 1" et 0X0B 
   	 CPA  	 0X0B,i		; 0X0B est insere artificiellement dans lecMot pour signifier une fin de ligne.
- 	 BREQ    Fin		; break 
-   	 
+ 	 BREQ    Fin		; si 0B alors cela veut dire qu'il n'y a plus de mot 
+
  	 LDA   	racine,i  	; Insersion du noeud racine avec GAUCHE et DROITE à nul.
  	 STA   	-8,s  		;
  	 LDA   	debMot,d 	;
@@ -64,14 +65,12 @@ Lecture:NOP0 			; Boucle principale
  	 SUBSP   8,i  		;
  	 CALL    lecMot  	;
  	 LDA     0,s  		;
+	 CPA	 -1,i
+	 BREQ	 Fintamp
  	 STA     debMot,d 	; Enregistrement de l'adresse du début du mot lu.
          LDA     2,s 		;
 	 ADDSP   4,i		;
 	 STA     ptrMot,d	;
-
- 	LDA     ptrMot,d 	;
-	CPA	tablmt,i	;
-	BRGT	Fintamp
  	SUBA    1,i  		; 
  	STA     temp1,d  	;
  	LDA     0,i  		;
@@ -207,10 +206,14 @@ lecBou:  CHARI   lecCode,s   	;
 
 lecEcri: STBYTEA lecPtr,sf 	;
 	 BREQ	 lecFin		;
+
+
 	 CPA	 1,i		;
 	 BREQ	 lecFinA	;	
 	 LDA  	 lecPtr,s 	;
 	 ADDA  	 1,i  		;
+	 CPA	 finTamp,i
+	 BREQ 	 lecFinC
   	 STA  	 lecPtr,s 	;
 	 BR   	 lecBou  	; tant que le caratere lu n'est pas nul et n'est pas egal a 0x0A.
 
@@ -226,6 +229,9 @@ lecFinA: NOP0			;
   	 STA  	 lecPtr,s 	;
 	 LDA	 0x0A,i 	;
 	 STBYTEA lecPtr,sf  	;
+	 BR 	 lecFin
+lecFinC: LDA	 -1,i
+	 STA	 lecVRet,s
 
 lecFin:  LDA  	 lecPtr,s 	;
          ADDA  	 1,i  		;
@@ -467,7 +473,8 @@ affFinal:LDA 	 AffRet,s  ;
  
 
 tabMot:  .BLOCK  255 
-tablmt:	 .BYTE 	 0
+
+finTamp:	 .BYTE 	 0
 
 ptrMot:  .ADDRSS tabMot
 debMot:  .ADDRSS tabMot
