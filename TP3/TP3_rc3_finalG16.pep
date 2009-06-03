@@ -1,9 +1,9 @@
 ; ********************************************************************************
 ; * I N F 2 1 7 0 (TP3 partie 2)
 ; *
-; * Ce programme prend un texte saisie par l'utilisateur et la place en ordre
+; * Ce programme prend un texte saisie par l'utilisateur et place ses mots en ordre
 ; * alphabétique dans un arbre binaire. Ensuite, il affiche chaque mot (en ordre
-; * alphabétique) ainsi que son nombre d'occurences.
+; * alphabétique) ainsi que son nombre d'occurrences.
 ; *
 ; * Les sous programmes suivants sont utilisés:
 ; * 
@@ -13,18 +13,23 @@
 ; *    Sous-programme fourni par Philippe Gabrini.
 ; *  
 ; * LecMot:   Lit les mots de la chaine entrée, converti les caractères alphabétiques
-; *    en minuscule et s'occupe ensuite de les insérer dans un tampon divisisés
-; *    par des octets nuls. Il retourne l'adresse du dernier mot saisi.
+; *    en minuscules et transforme les caracteres invalides en carateres nuls Il s'occupe 
+; *    ensuite de les insérer dans un tampon. Les caracters nuls delimitent les mot, un 
+; *    caracere nulls est conserve dans le tampon,entre chaque. 
+; *    Il retourne l'adresse de début et de fin du dernier mot saisi. 
 ; *
-; * Compare:  Compare deux mots entrés en paramètre, il retournera une valeur
-; *    selon la comparaison lexicographique des deux mots.
+; * Compare:  Compare deux mots entrés en paramètre, il retournera une valeur entiere
+; *    selon le resultat de la comparaison lexicographique entre les deux mots.
 ; *
 ; * Inserer;  Insere le mot passé en paramètre dans l'arbre selon la position
 ; *    qu'il devrait y prendre. Il ajoutera automatiquement une occurence
-; *    au mot en question s'il existe déjà dans l'arbre.
+; *    au mot en question s'il est nouveau ou s'il existe déjà dans l'arbre.
+; *    Ce sous-programme est recursif.
 ; * 
-; * Affiche:  Affiche le contenu de l'arbre passé en paramètre en ordre croissant.
-; *    (Alphabétique si l'arbre contient des caractères)
+; * Affiche:  Affiche les mots de l'arbre passé en paramètre en ordre croissant. 
+; * 	Chaque mot est accompagné de son nombre d'occurrences. Ce sous-programme est
+; *     recursif.
+; *    
 ; * 
 ; * 
 ; * Groupe 16 >>
